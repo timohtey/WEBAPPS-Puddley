@@ -13,13 +13,11 @@
         <link href="Styles/bootstrap.css" rel="stylesheet">
 
         <script>
-
             var map;
             var centerOfMap = new google.maps.LatLng(14.56486, 120.99370);
+
             function initialize()
             {
-
-
                 var mapInitialize = {
                     center: centerOfMap,
                     zoom: 15,
@@ -29,6 +27,18 @@
                 map = new google.maps.Map(document.getElementById("PuddleyMap")
                         , mapInitialize);
 
+
+                $.get("dbControl.php", function(data) {
+                    $(data).find("marker").each(function() {                                                
+                        
+                        var type = $(this).attr('type');
+                        var desc = '<p>' + $(this).attr('description') + '</p>';
+                        var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));
+
+                        //Iterate through types of icons
+                        add_marker(point,type, desc, true, false, false, "");
+                    });
+                });
                 //Right Click to Drop a New Marker
                 google.maps.event.addListener(map, 'rightclick', function(event) {
                     //form to be displayed with new marker
@@ -38,7 +48,7 @@
                             '<option value="Construction">Construction</option><option value="Heavy Traffic">Heavy Traffic</option></select></label>' +
                             '<label for="pDesc"><span>What Happened here ?</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200"></textarea></label>' +
                             '</form>' +
-                            '</div></p><button name="save-marker" class="save-marker">Save Marker Details</button>';
+                            '</div></p><button name="save-marker" class="save-marker">Save Report!</button>';
                     //Drop a new Marker with our Edit Form 
                     //CHANGE LAST PARAM TO CHOSEN ICON
                     add_marker(event.latLng, 'Report Area', Report_Form, true, true, true, "");
@@ -77,11 +87,11 @@
                     remove_marker(marker);
                 });
 
-                if (typeof saveBtn !== 'undefined') 
+                if (typeof saveBtn !== 'undefined')
                 {
                     //add click listner to save marker button
                     google.maps.event.addDomListener(saveBtn, "click", function(event) {
-                        var mReplace = contentString.find('span.info-content'); 
+                        var mReplace = contentString.find('span.info-content');
                         var mType = contentString.find('select.save-type')[0].value; //type of marker
                         var mDesc = contentString.find('textarea.save-desc')[0].value; //description input field value
 
@@ -93,7 +103,7 @@
                         }
                     });
                     google.maps.event.addListener(marker, 'click', function() {
-                        infowindow.open(map, marker); 
+                        infowindow.open(map, marker);
                     });
 
                     if (InfoOpenDefault)
@@ -113,33 +123,33 @@
                 console.log(replaceWin);
                 $.ajax({
                     type: "POST",
-                    url: "map_process.php",
+                    url: "dbControl.php",
                     data: myData,
                     success: function(data) {
-                        replaceWin.html(data); 
+                        replaceWin.html(data);
                         Marker.setDraggable(false);
                         // REPLACE ICON HERE
                     },
                     error: function(xhr, ajaxOptions, thrownError) {
-                        alert(thrownError); 
+                        alert(thrownError);
                     }
                 });
             }
 
             //------------------REMOVE MARKER FUNCTION---------------------------
             function remove_marker(Marker)
-            {               
+            {
                 if (Marker.getDraggable())
                 {
                     Marker.setMap(null); //just remove new marker
                 }
                 else
-                {                  
+                {
                     var mLatLang = Marker.getPosition().toUrlValue(); //get marker position
                     var myData = {del: 'true', latlang: mLatLang}; //post variables
                     $.ajax({
                         type: "POST",
-                        url: "map_process.php",
+                        url: "dbControl.php",
                         data: myData,
                         success: function(data) {
                             Marker.setMap(null);
@@ -151,6 +161,7 @@
                     });
                 }
             }
+
 
             google.maps.event.addDomListener(window, 'load', initialize);
             google.maps.event.addDomListener(window, "resize", function() {
@@ -201,6 +212,7 @@
         <div class="container" style='padding-top: 50px; padding-left: 0; padding-right: 0' >
             <div class="row">
                 <div id="PuddleyMap" style='width:100%; height:800px'> </div>
+
             </div>
         </div>
 
