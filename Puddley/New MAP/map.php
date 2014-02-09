@@ -29,14 +29,14 @@
 
 
                 $.get("dbControl.php", function(data) {
-                    $(data).find("marker").each(function() {                                                
-                        
+                    $(data).find("marker").each(function() {
+
                         var type = $(this).attr('type');
                         var desc = '<p>' + $(this).attr('description') + '</p>';
                         var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));
 
                         //Iterate through types of icons
-                        add_marker(point,type, desc, true, false, false, "");
+                        add_marker(point, type, desc, true, false, false, "");
                     });
                 });
                 //Right Click to Drop a New Marker
@@ -102,15 +102,18 @@
                             save_marker(marker, mDesc, mType, mReplace);
                         }
                     });
-                    google.maps.event.addListener(marker, 'click', function() {
-                        infowindow.open(map, marker);
-                    });
+                   
 
                     if (InfoOpenDefault)
                     {
                         infowindow.open(map, marker);
                     }
                 }
+                
+                 google.maps.event.addListener(marker, 'click', function() {
+                        infowindow.open(map, marker);
+                    });
+
 
             }
 
