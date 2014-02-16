@@ -30,22 +30,6 @@
             var directionsService = new google.maps.DirectionsService();
           
 
-            function getCurrentLocation(){
-                navigator.geolocation.getCurrentPosition(onSuccess, onError);
-            }
-
-            function onSuccess(position) {
-                centerOfMap = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-                
-                initialize();
-            }
-
-       
-             function onError(error) {
-                alert('code: ' + error.code + '\n' +
-                    'message: ' + error.message + '\n');
-            }
-
             function initialize()
             {
                 directionsDisplay = new google.maps.DirectionsRenderer();
