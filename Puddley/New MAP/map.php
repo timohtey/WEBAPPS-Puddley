@@ -16,16 +16,81 @@
             var map;
             var centerOfMap = new google.maps.LatLng(14.56486, 120.99370);
 
+            var startIsSet = false;
+            var startLocation;
+            var destinationLocation;
+            var waypts = [];
+
+            var currLetter = 65;
+            
+
+            var markers = [];
+
+            var directionsDisplay;
+            var directionsService = new google.maps.DirectionsService();
+          
+
+            function getCurrentLocation(){
+                navigator.geolocation.getCurrentPosition(onSuccess, onError);
+            }
+
+            function onSuccess(position) {
+                centerOfMap = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                
+                initialize();
+            }
+
+       
+             function onError(error) {
+                alert('code: ' + error.code + '\n' +
+                    'message: ' + error.message + '\n');
+            }
+
             function initialize()
             {
+                directionsDisplay = new google.maps.DirectionsRenderer();
                 var mapInitialize = {
                     center: centerOfMap,
                     zoom: 15,
+                    disableDoubleClickZoom: true,
                     mapTypeId: google.maps.MapTypeId.ROADMAP
 
                 };
                 map = new google.maps.Map(document.getElementById("PuddleyMap")
                         , mapInitialize);
+
+                directionsDisplay.setMap(map);
+                directionsDisplay.setOptions( { suppressMarkers: true } );
+                google.maps.event.addListener(map, "dblclick", function (e) { 
+                         if(startIsSet == true){
+                            destinationLocation = new google.maps.LatLng(e.latLng.lat(), e.latLng.lng());
+                            
+                            placeMarker(destinationLocation);
+                            startIsSet = false;
+                            var request = {
+                              origin: startLocation,
+                              destination: destinationLocation,
+                              waypoints: waypts,
+                              optimizeWaypoints: true,
+                              travelMode: google.maps.TravelMode.DRIVING
+                            };
+
+                            directionsService.route(request, function(response, status) {
+                                if (status == google.maps.DirectionsStatus.OK) {
+                                  directionsDisplay.setDirections(response);
+                                }else
+                                    alert("Routing failed!");
+                                  
+                            });
+
+                         }else{
+                            startLocation = new google.maps.LatLng(e.latLng.lat(), e.latLng.lng());
+                           
+                            placeMarker(startLocation);
+                            startIsSet = true;
+                         }
+                             
+                }); 
 
 
                 $.get("dbControl.php", function(data) {
@@ -117,6 +182,42 @@
 
             }
 
+            function placeMarker(location) {
+                var image;
+
+                if(startIsSet == true){
+
+                    image = "markers/brown_Marker";
+                    image = image.concat(String.fromCharCode(currLetter++));
+                    image = image.concat(".png");
+                    
+                    var marker = new google.maps.Marker({
+                        position: destinationLocation, 
+                        map: map,
+                        icon: image
+
+                    });
+
+                } else {
+                    image = "markers/blue_Marker";
+                    image = image.concat(String.fromCharCode(currLetter));
+                    image = image.concat(".png");
+                    
+                    var marker = new google.maps.Marker({
+                        position: startLocation, 
+                        map: map,
+                        icon: image
+
+                    });
+                }
+                
+
+               
+
+                markers.push(marker);
+
+            }
+
             //------------------SAVE MARKER TO DB FUNCTION---------------------------
             function save_marker(Marker, mDesc, mType, replaceWin)
             {
@@ -165,6 +266,8 @@
                 }
             }
 
+            
+
 
             google.maps.event.addDomListener(window, 'load', initialize);
             google.maps.event.addDomListener(window, "resize", function() {
@@ -172,6 +275,8 @@
                 google.maps.event.trigger(map, "resize");
                 map.setCenter(center);
             });
+
+
 
         </script>
         <style type="text/css">
