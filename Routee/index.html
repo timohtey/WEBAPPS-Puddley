@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8">
+    <title>Routee</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <link href="css/simple.css" rel="stylesheet">
+    <style>
+	body
+	{ 
+		background-color: #f1c40f;
+		background-repeat:no-repeat;
+		background-attachment:fixed;
+	}
+    </style>
+	
+	<link rel="icon" sizes="144x144" href="puddley_icon_header.png">
+    <link rel="shortcut icon" href="puddley_icon_header.png">	
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+
+    <script>
+    	function initialize(){
+			var sourceInput = document.getElementById('sourceSearchText');
+			var destinationInput = document.getElementById('destinationSearchText');
+
+		    var autocomplete = new google.maps.places.Autocomplete(sourceInput, {country: 'NL'});
+		    var autocomplete2 = new google.maps.places.Autocomplete(destinationSearchText, {country: 'NL'});
+
+		    autocomplete.bindTo('bounds', map);
+		    autocomplete2.bindTo('bounds', map);
+
+		    var infowindow = new google.maps.InfoWindow();
+
+		    google.maps.event.addListener(autocomplete, 'place_changed', function() {
+		      infowindow.close();
+		      var place = autocomplete.getPlace();
+		    });
+
+		     google.maps.event.addListener(autocomplete2, 'place_changed', function() {
+		      infowindow.close();
+		      var place = autocomplete2.getPlace();
+		    });
+
+		    setupClickListener('changetype-all', []);
+  		}
+ 		google.maps.event.addDomListener(window, 'load', initialize);
+	</script>
+</head>
+  
+<body>
+	
+	<div class="container-first">
+		<h1 align = "center">
+			<img src = "images/chibi.png" alt = "logo">
+			<img src = "images/Name.png" alt = "logo">
+		</h1>
+    </div>
+  
+	<br/><br/>
+	
+	<div class = "container">
+		<div class = "row">
+			<div class = "col-lg-4">
+				<h2 align = "center">
+					<img src = "images/Arrow.png">
+				</h2>
+			</div>
+		<div class = "well">
+			<h3 align = "center">Stuck?</br> No need to worry. </h3>
+			<div class = "row">
+				<div class="col-lg-12">
+					<input id="sourceSearchText" type="text"class="form-control" placeholder="From where?">
+				</div>
+			</div>
+				
+			<br/>
+
+			<div class = "row">
+				<div class="col-lg-12">
+					<input id="destinationSearchText" type="text" class="form-control" placeholder="To where?">
+				</div>
+			</div>
+
+			<br/>
+				
+			<button type="button" class="btn btn-primary btn-lg active btn-block">Show me the way!</button>
+				</div><!--well end-->
+			</div> <!--col-lg-4 end-->
+			
+			<div class = "col-lg-8">
+			
+					<h2 align = "center">
+					<img src = "images/Phone.png">
+					</h2>
+					
+			<div class = "row">
+				<div class = "col-lg-6">
+					<div class = "well">
+						<h3 align = "center"> Please give us areas that need attention. </h3></br>
+						
+						<div class = "row">
+							<div class="col-lg-12">
+								<input type="text" class="form-control" placeholder = "What's the situation?">
+							</div>
+						</div>	
+						<br/>
+						<div class = "row">
+							<div class="col-lg-12">
+								<input type="text" class="form-control" placeholder = "And where is it happening?">
+							</div>
+						</div>	
+						<br/>
+						<button type="button" class="btn btn-info btn-lg btn-block">Contribute</button>
+					</div>
+				</div>
+				
+				<div class = "col-lg-6">
+					<div class = "well">
+						<h3 align = "center">
+						<p>You could also report via mobile SMS!</p>
+						</br>
+						<img src = "images/report_phone.png" width = "290px" height = "370px">
+						</h3>
+						</br>
+					</div>
+				</div>
+				
+			</div>
+					
+
+			</div> <!-- col-lg-8 end-->
+			
+			
+		</div>
+	</div>
+  
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+  </script>
+
+  </body>
+  
+  </html>
