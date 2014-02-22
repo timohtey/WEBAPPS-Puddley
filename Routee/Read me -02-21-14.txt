@@ -1,6 +1,0 @@
-This is layout trial # 4.
-The goal of this design is to initally have two buttons and clicking will show a specific form.
-Clicking "Changed my mind" will return the two buttons.
-Form will appear with an appropriate logo/label at the right side.
-need suggestions
-Iconography will be out soon.
