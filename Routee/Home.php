@@ -44,6 +44,45 @@
     </style>
     
 </head>
+
+ <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+
+    <script>
+        function initialize(){
+            var sourceInput = document.getElementById('sourceSearchText');
+            var destinationInput = document.getElementById('destinationSearchText');
+            var eventInput = document.getElementById('eventSearchText');
+
+            var autocomplete = new google.maps.places.Autocomplete(sourceInput, {country: 'NL'});
+            var autocomplete2 = new google.maps.places.Autocomplete(destinationSearchText, {country: 'NL'});
+            var autocomplete3 = new google.maps.places.Autocomplete(eventSearchText, {country: 'NL'});
+
+            autocomplete.bindTo('bounds', map);
+            autocomplete2.bindTo('bounds', map);
+            autocomplete3.bindTo('bounds', map);
+
+            var infowindow = new google.maps.InfoWindow();
+
+            google.maps.event.addListener(autocomplete, 'place_changed', function() {
+              infowindow.close();
+              var place = autocomplete.getPlace();
+            });
+
+             google.maps.event.addListener(autocomplete2, 'place_changed', function() {
+              infowindow.close();
+              var place = autocomplete2.getPlace();
+            });
+
+             google.maps.event.addListener(autocomplete2, 'place_changed', function() {
+              infowindow.close();
+              var place = autocomplete3.getPlace();
+            });
+
+            setupClickListener('changetype-all', []);
+        }
+        google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
 </script>
 
@@ -69,6 +108,9 @@ $(document).ready(function(){
     $("#rp").fadeIn();
     $("#rr").fadeIn();
     $("#report").fadeOut();
+    $('#eventSearchText').val('');
+    $('#remarksText').val('');
+    $('#situationText').val('');
   });
 });
 
@@ -77,6 +119,8 @@ $(document).ready(function(){
     $("#rp").fadeIn();
     $("#rr").fadeIn();
     $("#route").fadeOut();
+    $('#sourceSearchText').val('');
+    $('#destinationSearchText').val('');
   });
 });
 
@@ -125,9 +169,9 @@ $(document).ready(function(){
                 <h2 align = "center" style = "font-family:Custom3;font-size:200%;color:black;"> Rerouting </h2>
                 <p align = "center"> We'll be helping you in finding the best route possible.</p>
                 <br>
-                <input type="text" class="form-control" placeholder="Where did you come from?">
+                <input id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
                 <br/>
-                <input type="text" class="form-control" placeholder="Where do you want to go?">
+                <input id = "destinationSearchText" type="text" class="form-control" placeholder="Where do you want to go?">
                 <br/>
                 <div class="btn-group btn-group-justified">
                     <div class="btn-group">
@@ -155,11 +199,11 @@ $(document).ready(function(){
             <div class = "well">
                 <h2 align = "center" style = "font-family:Custom3;font-size:200%;color:black;"> Reporting </h2>
                 <p align = "center">Let us know what is going on.</p><br>
-                <input type="text" class="form-control" placeholder="What's the situation?">
+                <input type="text" id ="situationText" class="form-control" placeholder="What's the situation?">
                 <br/>
-                <input type="text" class="form-control" placeholder="Where is it happening?">
+                <input type="text" id = "eventSearchText" class="form-control" placeholder="Where is it happening?">
                 <br/>
-                <input type="text" class="form-control" placeholder="Anything to take note of?">
+                <input type="text" id = "remarksText"class="form-control" placeholder="Anything to take note of?">
                 <br/>
                 <div class="btn-group btn-group-justified">
                     <div class="btn-group">
