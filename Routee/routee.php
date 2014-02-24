@@ -13,9 +13,15 @@
         <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
 
         <?php
-        $type = $_REQUEST['pType'];
-        $place = $_REQUEST['placeName'];
-        $Description = $_REQUEST['pDesc'];
+        try {
+            if (!empty($_REQUEST['pType']) && !empty($_REQUEST['placeName']) && !empty($_REQUEST['pDesc'])) {
+                $type = $_REQUEST['pType'];
+                $place = $_REQUEST['placeName'];
+                $Description = $_REQUEST['pDesc'];
+            }
+        } catch (Exception $e) {
+            
+        }
         ?>
         <script>
             var map;
@@ -105,7 +111,7 @@
                             var Report_Form = '<p><div class="marker-edit">' +
                                     '<form action="ajax-save.php" method="POST" name="SaveMarker" id="SaveMarker">' +
                                     '<label for="pType"><span>Area Type :</span> <select name="pType" class="save-type">' + typeConcat + '</select></label>' +
-                                    '<label for="pDesc"><span>Event Details</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200">' + desc +'</textarea></label>' +
+                                    '<label for="pDesc"><span>Event Details</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200">' + desc + '</textarea></label>' +
                                     '</form>' +
                                     '</div></p><button name="save-marker" class="save-marker">Save Report!</button>';
 
@@ -115,11 +121,6 @@
 
                     });
                 }
-                else
-                    alert("No initial place to report!");
-
-
-
                 $.get("dbControl.php", function(data) {
                     $(data).find("marker").each(function() {
 
