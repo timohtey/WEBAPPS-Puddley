@@ -21,31 +21,20 @@
 
     @font-face{
         font-family: Custom1;
-        src: url(YOUARETHEONE.TTF);
+        src: url(fonts/YOUARETHEONE.TTF);
     }
 
-    @font-face{
-        font-family: Custom2;
-        src: url(WELTU_.TTF);
-    }
-
-    @font-face{
-        font-family: Custom3;
-        src: url(GTR.TTF);
-    }
 
     body
     {
-        background-image: url(roadflat.jpg);
+        background-image: url(routwall1.jpg);
         background-repeat:no-repeat;
         background-size:cover;
         background-position:center;
     }
     </style>
-    
-</head>
 
- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
 
     <script>
         function initialize(){
@@ -125,16 +114,16 @@ $(document).ready(function(){
 });
 
 </script>
+    
+</head>
 
 <body>
 
-<nav class="navbar navbar-default navbar-static-top" role="navigation">
-  <div class="container">
+  <div class="masthead">
     <h1 align = "center" style = "font-family:Custom1;font-size:450%;color:#27ae60;">
     Routee
     </h1>
   </div>
-</nav>
 
 <br>
 <br>
@@ -144,7 +133,7 @@ $(document).ready(function(){
     
     <div class = "row">
         <div class = "col-lg-4">
-            <button type="button" class="btn btn-primary btn-lg btn-block" id = "rr" style = "font-family:Custom2;font-size:250%;color:#f1c40f;">Reroute</button>
+            <button type="button" class="btn btn-primary btn-lg btn-block" id = "rr" style = "font-family:Custom1;font-size:250%;color:#f1c40f;">Reroute</button>
         </div>
 
         <div class = "col-lg-4">
@@ -153,7 +142,7 @@ $(document).ready(function(){
         </div>
 
         <div class = "col-lg-4">
-            <button type="button" class="btn btn-primary btn-lg btn-block" id = "rp" style = "font-family:Custom2;font-size:250%;color:#f1c40f;">Report</button>
+            <button type="button" class="btn btn-primary btn-lg btn-block" id = "rp" style = "font-family:Custom1;font-size:250%;color:#f1c40f;">Report</button>
         </div>
 
     </div>
@@ -166,7 +155,7 @@ $(document).ready(function(){
 
         <div class = "col-lg-4">
             <div class = "well">
-                <h2 align = "center" style = "font-family:Custom3;font-size:200%;color:black;"> Rerouting </h2>
+                <h2 align = "center" style = "font-family:Custom1;font-size:200%;color:black;"> Rerouting </h2>
                 <p align = "center"> We'll be helping you in finding the best route possible.</p>
                 <br>
                 <input id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
@@ -197,7 +186,7 @@ $(document).ready(function(){
 
         <div class = "col-lg-4">
             <div class = "well">
-                <h2 align = "center" style = "font-family:Custom3;font-size:200%;color:black;"> Reporting </h2>
+                <h2 align = "center" style = "font-family:Custom1;font-size:200%;color:black;"> Reporting </h2>
                 <p align = "center">Let us know what is going on.</p><br>
                 <input type="text" id ="situationText" class="form-control" placeholder="What's the situation?">
                 <br/>
