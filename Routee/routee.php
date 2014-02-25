@@ -433,8 +433,12 @@
                             <div class="form-group">
                                 <input id="sourceTextBox" type="text" class="form-control" placeholder="From where?">
                                 <input id="destinationTextBox" type="text" class="form-control" placeholder="To where?">
+                                <input type="button" onclick="routeAddress()" class="btn btn-default" value="Find It">
                             </div>
+                            <!--
                             <button type="submit" onclick="routeAddress()" class="btn btn-default">Find it</button>
+                            -->
+                            
                         </form>
                     </ul>
                 </div>
