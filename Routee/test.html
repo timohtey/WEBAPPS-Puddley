@@ -7,6 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <link href="css/simple.css" rel="stylesheet" type="text/css">
+        <link rel="shortcut icon" href = "images/logo.png">
 
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
         </script>      
@@ -24,7 +25,7 @@
             {
                 background-image: url(images/routwall1.jpg);
                 background-repeat:no-repeat;
-                background-size:cover;
+                left:0;top:0;right:0;bottom:0;
                 background-position:center;
             }
         </style>
@@ -54,9 +55,11 @@
                     var place = autocomplete2.getPlace();
                 });
 
-                google.maps.event.addListener(autocomplete3, 'place_changed', function() {
+                google.maps.event.addListener(autocomplete2, 'place_changed', function() {
                     infowindow.close();
                     var place = autocomplete3.getPlace();
+                    
+                    
                 });
 
                 setupClickListener('changetype-all', []);
@@ -68,7 +71,9 @@
                 $("#rr").click(function() {
                     $("#rr").fadeOut();
                     $("#rp").fadeOut();
+                    $("#route").animate({bottom:"100px"});
                     $("#route").fadeIn();
+                    
                 });
             });
 
@@ -76,15 +81,16 @@
                 $("#rp").click(function() {
                     $("#rp").fadeOut();
                     $("#rr").fadeOut();
+                    $("#report").animate({bottom:"100px"});
                     $("#report").fadeIn();
                 });
             });
 
             $(document).ready(function() {
                 $("#getmrp").click(function() {
-                    $("#rp").fadeIn();
-                    $("#rr").fadeIn();
-                    $("#report").fadeOut();
+                    $("#report").fadeOut("fast");
+                    $("#rp").fadeIn("slow");
+                    $("#rr").fadeIn("slow");
                     $('#eventSearchText').val('');
                     $('#remarksText').val('');
                     $('#situationText').val('');
@@ -93,9 +99,9 @@
 
             $(document).ready(function() {
                 $("#getmrr").click(function() {
-                    $("#rp").fadeIn();
-                    $("#rr").fadeIn();
-                    $("#route").fadeOut();
+                    $("#route").fadeOut("fast");
+                    $("#rp").fadeIn("slow");
+                    $("#rr").fadeIn("slow");
                     $('#sourceSearchText').val('');
                     $('#destinationSearchText').val('');
                 });
@@ -115,7 +121,7 @@
 
     <body>        
         <div class="masthead">
-            <h1 align = "center"  style = "font-family:Custom1;font-size:450%;color:#27ae60;">
+            <h1 align = "center"  style = "font-family:Custom1;font-size:450%;color:#27ae60;text-shadow:5px 5px 10px black;">
                 Routee
             </h1>
         </div>
@@ -142,7 +148,7 @@
 
             </div>
 
-            <div class = "row"  style = "display:none;" id = "route">
+            <div class = "row"  style = "display:none;position:relative;" id = "route">
 
                 <div class ="col-lg-4">
                 </div>
@@ -173,7 +179,7 @@
 
             </div>
 
-            <div class = "row"  style = "display:none;" id = "report">
+            <div class = "row"  style = "display:none;position:relative;" id = "report">
 
                 <div class ="col-lg-4">
                 </div>
@@ -194,8 +200,10 @@
                             <br/>
                             <input name="placeName" type="text" id = "eventSearchText" class="form-control" placeholder="Where is it happening?" >
                             <br/>
-                            <input name="pDesc" type="text" id = "remarksText" class="form-control" placeholder="Anything to take note of?">
-                            <br/>                            
+                            <textarea class="form-control" rows="3" name = "pDesc" id = "remarksText" placeholder= "Anything to take note of?"></textarea> 
+                            <br/>
+
+
 
                             <div class="btn-group btn-group-justified">
                                 <div class="btn-group" >                                                       
