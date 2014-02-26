@@ -53,74 +53,7 @@
                 directionsDisplay.setMap(map);
                 directionsDisplay.setOptions({suppressMarkers: true});
 
-                var place = '<?php echo $place; ?>';
-                var type = '<?php echo $type; ?>';
-                var desc = '<?php echo $Description ?>';
-
-                if (place != '' && type != '' && desc != '')
-                {
-                    $.ajax({
-                        url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + place + "&sensor=false",
-                        type: "POST",
-                        success: function(res) {
-                            console.log(res.results[0].geometry.location.lat);
-                            console.log(res.results[0].geometry.location.lng);
-                            var pos = new google.maps.LatLng(res.results[0].geometry.location.lat, res.results[0].geometry.location.lng);
-                            map.setCenter(pos);
-                            var typeConcat;
-                            if (type == "Accident")
-                            {
-                                typeConcat = '<option value="Accident" selected= "selected">Accident</option>' +
-                                        '<option value="Flood">Flood</option>' +
-                                        '<option value="Construction">Construction</option>' +
-                                        '<option value="Heavy Traffic">Heavy Traffic</option>' +
-                                        '<option value="Others">Others</option>';
-                            }
-                            else if (type == "Flood")
-                            {
-                                typeConcat = '<option value="Accident" >Accident</option>' +
-                                        '<option value="Flood" selected= "selected">Flood</option>' +
-                                        '<option value="Construction">Construction</option>' +
-                                        '<option value="Heavy Traffic">Heavy Traffic</option>' +
-                                        '<option value="Others">Others</option>';
-                            }
-                            else if (type == "Construction")
-                            {
-                                typeConcat = '<option value="Accident" >Accident</option>' +
-                                        '<option value="Flood" >Flood</option>' +
-                                        '<option value="Construction" selected= "selected">Construction</option>' +
-                                        '<option value="Heavy Traffic">Heavy Traffic</option>' +
-                                        '<option value="Others">Others</option>';
-                            }
-
-                            else if (type == "Heavy Traffic")
-                            {
-                                typeConcat = '<option value="Accident" >Accident</option>' +
-                                        '<option value="Flood" >Flood</option>' +
-                                        '<option value="Construction" >Construction</option>' +
-                                        '<option value="Heavy Traffic" selected= "selected">Heavy Traffic</option>' +
-                                        '<option value="Others">Others</option>';
-                            }
-                            else
-                            {
-                                typeConcat = '<option value="Accident" >Accident</option><option value="Flood" >Flood</option>' +
-                                        '<option value="Construction" >Construction</option><option value="Heavy Traffic" >Heavy Traffic</option>' +
-                                        '<option value="Others" selected= "selected">Others</option>';
-                            }
-
-                            var Report_Form = '<p><div class="marker-edit">' +
-                                    '<form action="ajax-save.php" method="POST" name="SaveMarker" id="SaveMarker">' +
-                                    '<label for="pType"><span>Area Type :</span> <select name="pType" class="save-type">' + typeConcat + '</select></label>' +
-                                    '<label for="pDesc"><span>Event Details</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200">' + desc + '</textarea></label>' +
-                                    '</form>' +
-                                    '</div></p><button name="save-marker" class="save-marker">Save Report!</button>';
-
-                            add_marker(pos, 'Report Area', Report_Form, true, true, true, "");
-                        }
-
-
-                    });
-                }
+               
                 $.get("dbControl.php", function(data) {
                     $(data).find("marker").each(function() {
 
