@@ -54,11 +54,9 @@
                     var place = autocomplete2.getPlace();
                 });
 
-                google.maps.event.addListener(autocomplete2, 'place_changed', function() {
+                google.maps.event.addListener(autocomplete3, 'place_changed', function() {
                     infowindow.close();
                     var place = autocomplete3.getPlace();
-                    
-                    
                 });
 
                 setupClickListener('changetype-all', []);
