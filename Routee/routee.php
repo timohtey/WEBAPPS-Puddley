@@ -98,6 +98,8 @@
                
                 autocomplete.bindTo('bounds', map);
                 autocomplete2.bindTo('bounds', map);
+                autocomplete.setComponentRestrictions({country: 'ph'});
+                autocomplete2.setComponentRestrictions({country: 'ph'});
 
                 var infowindow = new google.maps.InfoWindow();
 

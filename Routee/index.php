@@ -7,12 +7,7 @@
         <meta name="description" content="">
         <meta name="author" content="">
         <link href="css/simple.css" rel="stylesheet" type="text/css">
-
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
-        </script>      
-        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places">
-        </script>
-        <style>
+         <style>
 
             @font-face{
                 font-family: Custom1;
@@ -28,19 +23,29 @@
                 background-position:center;
             }
         </style>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>      
+        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places&region=ph"></script>
+
+       
         <script>
             function initialize() {
                 var sourceInput = document.getElementById('sourceSearchText');
                 var destinationInput = document.getElementById('destinationSearchText');
                 var eventInput = document.getElementById('eventSearchText');
 
-                var autocomplete = new google.maps.places.Autocomplete(sourceInput, {country: 'NL'});
-                var autocomplete2 = new google.maps.places.Autocomplete(destinationSearchText, {country: 'NL'});
-                var autocomplete3 = new google.maps.places.Autocomplete(eventSearchText, {country: 'NL'});
+                var autocomplete = new google.maps.places.Autocomplete(sourceInput);
+                var autocomplete2 = new google.maps.places.Autocomplete(destinationInput);
+                var autocomplete3 = new google.maps.places.Autocomplete(eventInput);
 
                 autocomplete.bindTo('bounds', map);
                 autocomplete2.bindTo('bounds', map);
                 autocomplete3.bindTo('bounds', map);
+
+                autocomplete.setComponentRestrictions({country: 'ph'});
+                autocomplete2.setComponentRestrictions({country: 'ph'});
+                autocomplete3.setComponentRestrictions({country: 'ph'});
 
                 var infowindow = new google.maps.InfoWindow();
 
