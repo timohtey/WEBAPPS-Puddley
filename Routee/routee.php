@@ -35,6 +35,8 @@
             var currLetter = 65
             var markers = [];
 
+            //Existing points
+            var Existing_points = new Array();
             var directionsDisplay;
             var directionsService = new google.maps.DirectionsService();
             function initialize() {
@@ -53,7 +55,77 @@
                 directionsDisplay.setMap(map);
                 directionsDisplay.setOptions({suppressMarkers: true});
 
-               
+
+                var place = '<?php echo $place; ?>';
+                var type = '<?php echo $type; ?>';
+                var desc = '<?php echo $Description ?>';
+
+                if (place != '' && type != '' && desc != '')
+                {
+                    $.ajax({
+                        url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + place + "&sensor=false",
+                        type: "POST",
+                        success: function(res) {
+                            console.log(res.results[0].geometry.location.lat);
+                            console.log(res.results[0].geometry.location.lng);
+                            var pos = new google.maps.LatLng(res.results[0].geometry.location.lat, res.results[0].geometry.location.lng);
+                            map.setCenter(pos);
+                            var typeConcat;
+                            if (type == "Accident")
+                            {
+                                typeConcat = '<option value="Accident" selected= "selected">Accident</option>' +
+                                        '<option value="Flood">Flood</option>' +
+                                        '<option value="Construction">Construction</option>' +
+                                        '<option value="Heavy Traffic">Heavy Traffic</option>' +
+                                        '<option value="Others">Others</option>';
+                            }
+                            else if (type == "Flood")
+                            {
+                                typeConcat = '<option value="Accident" >Accident</option>' +
+                                        '<option value="Flood" selected= "selected">Flood</option>' +
+                                        '<option value="Construction">Construction</option>' +
+                                        '<option value="Heavy Traffic">Heavy Traffic</option>' +
+                                        '<option value="Others">Others</option>';
+                            }
+                            else if (type == "Construction")
+                            {
+                                typeConcat = '<option value="Accident" >Accident</option>' +
+                                        '<option value="Flood" >Flood</option>' +
+                                        '<option value="Construction" selected= "selected">Construction</option>' +
+                                        '<option value="Heavy Traffic">Heavy Traffic</option>' +
+                                        '<option value="Others">Others</option>';
+                            }
+
+                            else if (type == "Heavy Traffic")
+                            {
+                                typeConcat = '<option value="Accident" >Accident</option>' +
+                                        '<option value="Flood" >Flood</option>' +
+                                        '<option value="Construction" >Construction</option>' +
+                                        '<option value="Heavy Traffic" selected= "selected">Heavy Traffic</option>' +
+                                        '<option value="Others">Others</option>';
+                            }
+                            else
+                            {
+                                typeConcat = '<option value="Accident" >Accident</option><option value="Flood" >Flood</option>' +
+                                        '<option value="Construction" >Construction</option><option value="Heavy Traffic" >Heavy Traffic</option>' +
+                                        '<option value="Others" selected= "selected">Others</option>';
+                            }
+
+                            var Report_Form = '<p><div class="marker-edit">' +
+                                    '<form action="ajax-save.php" method="POST" name="SaveMarker" id="SaveMarker">' +
+                                    '<label for="pType"><span>Area Type :</span> <select name="pType" class="save-type">' + typeConcat + '</select></label>' +
+                                    '<label for="pDesc"><span>Event Details</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200">' + desc + '</textarea></label>' +
+                                    '</form>' +
+                                    '</div></p><button name="save-marker" class="save-marker">Save Report!</button>';
+
+                            add_marker(pos, 'Report Area', Report_Form, true, true, true, "");
+                        }
+
+
+                    });
+                }
+
+                //Get the existing points
                 $.get("dbControl.php", function(data) {
                     $(data).find("marker").each(function() {
 
@@ -70,10 +142,12 @@
                             iconPath = "images/custom_markers/marker_traffic.png";
                         else
                             iconPath = "images/custom_markers/marker_others.png";
-
+                        Existing_points.push(point);
                         add_marker(point, type, desc, true, false, false, iconPath);
                     });
                 });
+
+
 
                 //Right Click to Drop a New Marker
                 google.maps.event.addListener(map, 'rightclick', function(event) {
@@ -92,10 +166,10 @@
                 // -------------- AUTCOMPLETE ----------------------//
                 var sourceInput = document.getElementById('sourceTextBox');
                 var destinationInput = document.getElementById('destinationTextBox');
-    
+
                 var autocomplete = new google.maps.places.Autocomplete(sourceInput);
                 var autocomplete2 = new google.maps.places.Autocomplete(destinationInput);
-               
+
                 autocomplete.bindTo('bounds', map);
                 autocomplete2.bindTo('bounds', map);
                 autocomplete.setComponentRestrictions({country: 'ph'});
@@ -266,6 +340,8 @@
                     });
                 }
             }
+
+
             function routeAddress() {
                 var source = document.getElementById("sourceTextBox").value;
                 var destination = document.getElementById("destinationTextBox").value;
@@ -281,18 +357,29 @@
                                 var request = {
                                     origin: startLocation,
                                     destination: destinationLocation,
-                                    waypoints: waypts,
-                                    optimizeWaypoints: true,
+                                    provideRouteAlternatives: true,
                                     travelMode: google.maps.TravelMode.DRIVING
                                 };
 
                                 directionsService.route(request, function(response, status) {
-                                    if (status == google.maps.DirectionsStatus.OK) {
-                                        directionsDisplay.setDirections(response);
+                                    if (status == google.maps.DirectionsStatus.OK)
+                                    {
+                                        map.fitBounds(response.routes[0].bounds);
+                                        //directionsDisplay.setDirections(response);
+                                        createPolyline(response);
+                                        var nPoints = response.routes[0].overview_path.length;
+                                        for (var i = 0; i < nPoints; i++)
+                                        {
+                                            var myLatlng = new google.maps.LatLng(response.routes[0].overview_path[i].lat(), response.routes[0].overview_path[i].lng());
+                                            if(google.maps.geometry.poly.isLocationOnEdge(myLatlng, Existing_points))
+                                                 alert(myLatlng);
+                                        }
                                     } else
                                         alert("Routing failed!");
 
                                 });
+
+
 
                             }
                         });
@@ -301,6 +388,27 @@
                 });
 
             }
+
+            function createPolyline(directionResult) {
+                var line = new google.maps.Polyline({
+                    path: directionResult.routes[0].overview_path, strokeColor: '#FF0000',
+                    strokeOpacity: 0.5,
+                    strokeWeight: 4
+                });
+
+                line.setMap(map);
+
+                for (var i = 0; i < line.getPath().length; i++) {
+                    var marker = new google.maps.Marker({
+                        icon: {path: google.maps.SymbolPath.CIRCLE, scale: 3},
+                        position: line.getPath().getAt(i),
+                        map: map
+                    });
+                }
+            }
+
+
+
             google.maps.event.addDomListener(window, 'load', initialize);
             google.maps.event.addDomListener(window, "resize", function() {
                 var center = map.getCenter();
@@ -308,11 +416,11 @@
                 map.setCenter(center);
             });
 
-
         </script>     
-		
+
+
     </head>
-    <body>
+    <body >
 
         <div class = "navbar navbar-default navbar-fixed-top">
             <div class = "container">
@@ -333,18 +441,19 @@
                             <!--
                             <button type="submit" onclick="routeAddress()" class="btn btn-default">Find it</button>
                             -->
-                            
+
                         </form>
                     </ul>
                 </div>
             </div>
         </div>
 
-      
+
         <div id="map-canvas"></div>
 
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <script src = "js/bootstrap.js"></script>
+
 
 
     </body>
