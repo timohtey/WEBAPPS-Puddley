@@ -69,6 +69,7 @@
                             console.log(res.results[0].geometry.location.lat);
                             console.log(res.results[0].geometry.location.lng);
                             var pos = new google.maps.LatLng(res.results[0].geometry.location.lat, res.results[0].geometry.location.lng);
+
                             map.setCenter(pos);
                             var typeConcat;
                             if (type == "Accident")
@@ -113,12 +114,13 @@
 
                             var Report_Form = '<p><div class="marker-edit">' +
                                     '<form action="ajax-save.php" method="POST" name="SaveMarker" id="SaveMarker">' +
+                                    '<label for="pAddress"><span>Address :</span> <textarea disabled name="address_ta" class="save-add" maxlength="200" placeholder= "Address">' + place + '</textarea></label>' +
                                     '<label for="pType"><span>Area Type :</span> <select name="pType" class="save-type">' + typeConcat + '</select></label>' +
                                     '<label for="pDesc"><span>Event Details</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200">' + desc + '</textarea></label>' +
                                     '</form>' +
                                     '</div></p><button name="save-marker" class="save-marker">Save Report!</button>';
 
-                            add_marker(pos, 'Report Area', Report_Form, true, true, true, "");
+                            add_marker(pos, 'Report Area', Report_Form, true, false, true, "");
                         }
 
 
@@ -130,8 +132,8 @@
                     $(data).find("marker").each(function() {
 
                         var type = $(this).attr('type');
-                        var desc = '<p>' + $(this).attr('description') + '</p>';
-                        var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));
+                        var desc = '<p>' + $(this).attr('Address') + '</p><hr>'+'<p>' + $(this).attr('description') + '</p>';
+                        var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));                        
                         var iconPath;
 
                         if (type === "Accident")
@@ -146,42 +148,28 @@
                         add_marker(point, type, desc, true, false, false, iconPath);
                     });
                 });
-
-
-
                 //Right Click to Drop a New Marker
                 google.maps.event.addListener(map, 'rightclick', function(event) {
-                    //form to be displayed with new marker
-                    var lat = event.latLng.lat();
-                    var lng = event.latLng.lng();
-                    var latlng = new google.maps.LatLng(lat, lng);
-                    geocoder.geocode({'latLng': latlng}, function(results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {
-                            if (results[1]) {
-                                marker = new google.maps.Marker({
-                                    position: latlng,
-                                    map: map
-                                });
-                                infowindow.setContent(results[1].formatted_address);
-                                infowindow.open(map, marker);
-                                var place = results[1].formatted_address;
-                                alert(place);
-                            } else {
-                                alert('No results found');
-                            }
-                        } else {
-                            alert('Geocoder failed due to: ' + status);
+                
+                    geocoder.geocode({'latLng': event.latLng}, function(results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {                           
+                           var address= results[0].formatted_address;
                         }
-                    });
+                        else {
+                            alert("Geocoder failed due to: " + status);
+                        }
+                    //form to be displayed with new marker
                     var Report_Form = '<p><div class="marker-edit">' +
                             '<form action="ajax-save.php" method="POST" name="SaveMarker" id="SaveMarker">' +
+                            '<label for="pAddress"><span>Address :</span> <textarea disabled name="address_ta" class="save-add" maxlength="200" placeholder= "Address">' + address + '</textarea></label>' +
                             '<label for="pType"><span>Area Type :</span> <select name="pType" class="save-type"><option value="Accident">Accident</option><option value="Flood">Flood</option>' +
                             '<option value="Construction">Construction</option><option value="Heavy Traffic">Heavy Traffic</option><option value="Others">Others</option></select></label>' +
                             '<label for="pDesc"><span>What Happened here ?</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200"></textarea></label>' +
                             '</form>' +
                             '</div></p><button name="save-marker" class="save-marker">Save Report!</button>';
 
-                    add_marker(event.latLng, 'Report Area', Report_Form, true, true, true, "");
+                    add_marker(event.latLng, 'Report Area', Report_Form, true, false, true, "");
+                     });
                 });
 
                 // -------------- AUTCOMPLETE ----------------------//
@@ -212,6 +200,8 @@
                 google.maps.event.addDomListener(window, 'load', initialize);
             }
 
+
+
             //------------------ADD MARKER FUNCTION---------------------------
             function add_marker(MapPos, MapTitle, MapDesc, InfoOpenDefault, DragAble, Removable, iconPath)
             {
@@ -229,7 +219,7 @@
                 var contentString = $('<div class="marker-info-win">' +
                         '<div class="marker-inner-win"><span class="info-content">' +
                         '<h3 class="marker-heading">' + MapTitle + '</h3>' +
-                        MapDesc +
+                        MapDesc + 
                         '</span><button name="remove-marker" class="remove-marker" title="Remove Marker">Remove Marker</button>' +
                         '</div></div>');
 
@@ -249,6 +239,7 @@
                     //add click listner to save marker button
                     google.maps.event.addDomListener(saveBtn, "click", function(event) {
                         var mReplace = contentString.find('span.info-content');
+                        var mAddress = contentString.find('textarea.save-add')[0].value; // Address
                         var mType = contentString.find('select.save-type')[0].value; //type of marker
                         var mDesc = contentString.find('textarea.save-desc')[0].value; //description input field value
 
@@ -256,7 +247,7 @@
                         {
                             alert("Please enter Description!");
                         } else {
-                            save_marker(marker, mDesc, mType, mReplace);
+                            save_marker(marker, mDesc, mType, mReplace, mAddress);
                         }
                     });
 
@@ -304,13 +295,13 @@
 
             }
             //------------------SAVE MARKER TO DB FUNCTION---------------------------
-            function save_marker(Marker, mDesc, mType, replaceWin)
+            function save_marker(Marker, mDesc, mType, replaceWin, mAddress)
             {
                 //Save new marker using jQuery Ajax
-                var mLatLang = Marker.getPosition().toUrlValue();
-                var myData = {description: mDesc, latlang: mLatLang, type: mType};
-                var iconPath;
+                var mLatLang = Marker.getPosition().toUrlValue();                                                
 
+                var myData = {description: mDesc, latlang: mLatLang, type: mType, address: mAddress};
+                var iconPath;
                 if (mType === "Accident")
                     iconPath = "images/custom_markers/marker_accident.png";
                 else if (mType === "Construction")
@@ -319,7 +310,6 @@
                     iconPath = "images/custom_markers/marker_traffic.png";
                 else
                     iconPath = "images/custom_markers/marker_others.png";
-
                 console.log(replaceWin);
                 $.ajax({
                     type: "POST",
@@ -370,7 +360,6 @@
                     if (status == google.maps.GeocoderStatus.OK) {
                         startLocation = results[0].geometry.location;
                         placeMarker(startLocation);
-
                         geocoder.geocode({'address': destination}, function(results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 destinationLocation = results[0].geometry.location;
@@ -381,7 +370,6 @@
                                     provideRouteAlternatives: true,
                                     travelMode: google.maps.TravelMode.DRIVING
                                 };
-
                                 directionsService.route(request, function(response, status) {
                                     if (status == google.maps.DirectionsStatus.OK)
                                     {
@@ -392,22 +380,16 @@
                                         for (var i = 0; i < nPoints; i++)
                                         {
                                             var myLatlng = new google.maps.LatLng(response.routes[0].overview_path[i].lat(), response.routes[0].overview_path[i].lng());
-                                            if(google.maps.geometry.poly.isLocationOnEdge(myLatlng, Existing_points))
-                                                 alert(myLatlng);
+                                            if (google.maps.geometry.poly.isLocationOnEdge(myLatlng, Existing_points))
+                                                alert(myLatlng);
                                         }
                                     } else
                                         alert("Routing failed!");
-
                                 });
-
-
-
                             }
                         });
-
                     }
                 });
-
             }
 
             function createPolyline(directionResult) {
@@ -416,9 +398,7 @@
                     strokeOpacity: 0.5,
                     strokeWeight: 4
                 });
-
                 line.setMap(map);
-
                 for (var i = 0; i < line.getPath().length; i++) {
                     var marker = new google.maps.Marker({
                         icon: {path: google.maps.SymbolPath.CIRCLE, scale: 3},
@@ -436,7 +416,6 @@
                 google.maps.event.trigger(map, "resize");
                 map.setCenter(center);
             });
-
         </script>     
 
 

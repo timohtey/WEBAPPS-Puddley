@@ -30,8 +30,9 @@ CREATE TABLE `markers` (
   `lat` float(10,6) NOT NULL,
   `lng` float(10,6) NOT NULL,
   `type` varchar(50) NOT NULL,
+  `Address` varchar(90) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=43 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +41,7 @@ CREATE TABLE `markers` (
 
 LOCK TABLES `markers` WRITE;
 /*!40000 ALTER TABLE `markers` DISABLE KEYS */;
-INSERT INTO `markers` VALUES (1,'dsadad',14.571622,120.992683,'Accident'),(2,'CRAP HAPPENS!',14.581091,120.979851,'Accident');
+INSERT INTO `markers` VALUES (38,'ddsadd',14.445153,120.992912,'Accident','Alabang-Zapote Road, Las Piñas, Metro Manila'),(39,'ssssxasxsax',14.455501,120.969002,'Accident','Molino Road, Bacoor City, Philippines'),(40,'sadasdasd',14.468425,120.980499,'Heavy Traffic','Naga Road, Las Pinas, Philippines'),(41,'czxcccxzc',14.479146,120.997971,'Accident','Dr. A. Santos Avenue, Parañaque, Philippines'),(42,'xasxasx',14.498425,120.992775,'Others','San Dionisio, Parañaque, Philippines');
 /*!40000 ALTER TABLE `markers` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-02-09 14:20:13
+-- Dump completed on 2014-03-16 22:32:27
