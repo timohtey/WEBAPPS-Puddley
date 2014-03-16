@@ -152,6 +152,27 @@
                 //Right Click to Drop a New Marker
                 google.maps.event.addListener(map, 'rightclick', function(event) {
                     //form to be displayed with new marker
+                    var lat = event.latLng.lat();
+                    var lng = event.latLng.lng();
+                    var latlng = new google.maps.LatLng(lat, lng);
+                    geocoder.geocode({'latLng': latlng}, function(results, status) {
+                        if (status == google.maps.GeocoderStatus.OK) {
+                            if (results[1]) {
+                                marker = new google.maps.Marker({
+                                    position: latlng,
+                                    map: map
+                                });
+                                infowindow.setContent(results[1].formatted_address);
+                                infowindow.open(map, marker);
+                                var place = results[1].formatted_address;
+                                alert(place);
+                            } else {
+                                alert('No results found');
+                            }
+                        } else {
+                            alert('Geocoder failed due to: ' + status);
+                        }
+                    });
                     var Report_Form = '<p><div class="marker-edit">' +
                             '<form action="ajax-save.php" method="POST" name="SaveMarker" id="SaveMarker">' +
                             '<label for="pType"><span>Area Type :</span> <select name="pType" class="save-type"><option value="Accident">Accident</option><option value="Flood">Flood</option>' +
