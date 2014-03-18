@@ -31,7 +31,7 @@
             var startLocation;
             var destinationLocation;
             var waypts = [];
-
+			var events = [];
             var currLetter = 65
             var markers = [];
 
@@ -358,7 +358,7 @@
 										    };
 										    directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
 										    directionsDisplay.setOptions({directions:response,routeIndex:index});
-					    					
+					    					directionsDisplay.setMap(map);
 					    					
 					    					 directionsService.route(request, function(result, status) {
 											       
