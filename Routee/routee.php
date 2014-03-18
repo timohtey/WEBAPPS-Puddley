@@ -262,38 +262,7 @@
                 });
             }
 
-            function placeMarker(location) {
-                var image;
-
-                if (startIsSet == true) {
-
-                    image = "images/markers/brown_Marker";
-                    image = image.concat(String.fromCharCode(currLetter++));
-                    image = image.concat(".png");
-
-                    var marker = new google.maps.Marker({
-                        position: destinationLocation,
-                        map: map,
-                        icon: image
-                    });
-                    startIsSet = false;
-
-                } else {
-                    image = "images/markers/blue_Marker";
-                    image = image.concat(String.fromCharCode(currLetter));
-                    image = image.concat(".png");
-
-                    var marker = new google.maps.Marker({
-                        position: startLocation,
-                        map: map,
-                        icon: image
-
-                    });
-                    startIsSet = true;
-                }
-                markers.push(marker);
-
-            }
+           
             //------------------SAVE MARKER TO DB FUNCTION---------------------------
             function save_marker(Marker, mDesc, mType, replaceWin, mAddress)
             {
@@ -353,43 +322,97 @@
             }
 
 
-            function routeAddress() {
+           function routeAddress() {
                 var source = document.getElementById("sourceTextBox").value;
                 var destination = document.getElementById("destinationTextBox").value;
                 geocoder.geocode({'address': source}, function(results, status) {
                     if (status == google.maps.GeocoderStatus.OK) {
                         startLocation = results[0].geometry.location;
-                        placeMarker(startLocation);
+                       
+
                         geocoder.geocode({'address': destination}, function(results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 destinationLocation = results[0].geometry.location;
-                                placeMarker(destinationLocation);
+                                
                                 var request = {
                                     origin: startLocation,
                                     destination: destinationLocation,
                                     provideRouteAlternatives: true,
                                     travelMode: google.maps.TravelMode.DRIVING
                                 };
+
                                 directionsService.route(request, function(response, status) {
-                                    if (status == google.maps.DirectionsStatus.OK)
-                                    {
-                                        map.fitBounds(response.routes[0].bounds);
-                                        //directionsDisplay.setDirections(response);
-                                        createPolyline(response);
-                                        var nPoints = response.routes[0].overview_path.length;
-                                        for (var i = 0; i < nPoints; i++)
-                                        {
-                                            var myLatlng = new google.maps.LatLng(response.routes[0].overview_path[i].lat(), response.routes[0].overview_path[i].lng());
-                                            if (google.maps.geometry.poly.isLocationOnEdge(myLatlng, Existing_points))
-                                                alert(myLatlng);
-                                        }
+                                    if (status == google.maps.DirectionsStatus.OK) {
+                                    	alert(response.routes.length);
+                                       	var index = 0;
+										response.routes.forEach(function(route){
+											var rendererOptions = {
+											    preserveViewport: true,         
+											    routeIndex:index
+											};
+											directionsService = new google.maps.DirectionsService();
+											var request = {
+										        origin: startLocation,
+										        destination: destinationLocation,
+										        travelMode: google.maps.TravelMode.DRIVING
+										    };
+										    directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+										    directionsDisplay.setOptions({directions:response,routeIndex:index});
+					    					
+					    					
+					    					 directionsService.route(request, function(result, status) {
+											       
+											
+											        if (status == google.maps.DirectionsStatus.OK) {
+											        	var polyline = new google.maps.Polyline({
+														    path: [],
+															strokeColor: '#FF0000',
+															strokeWeight: 3
+														});
+														var bounds = new google.maps.LatLngBounds();
+														
+														
+														var legs = response.routes[index++].legs;
+														for (i=0;i<legs.length;i++) {
+														  var steps = legs[i].steps;
+														  for (j=0;j<steps.length;j++) {
+														    var nextSegment = steps[j].path;
+														    for (k=0;k<nextSegment.length;k++) {
+														      polyline.getPath().push(nextSegment[k]);
+														      bounds.extend(nextSegment[k]);
+														    }
+														  }
+														}
+
+														events.forEach(function(element, index) {
+
+															    if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
+															            console.log(element + " YES");
+															    } else {
+															            console.log(element + " not on edge");
+															    }
+														   		
+														});
+
+											           	directionsDisplay.setDirections(result);
+											        }
+											 });
+											
+											
+										});
+                                       
+                                       
                                     } else
                                         alert("Routing failed!");
+
                                 });
+
                             }
                         });
+
                     }
                 });
+
             }
 
             function createPolyline(directionResult) {
