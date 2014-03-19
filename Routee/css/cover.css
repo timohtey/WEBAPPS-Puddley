@@ -13,9 +13,7 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 body {
-  background-size:cover;
-   background: url(../wall.jpg)  no-repeat;
-   min-height: 100%;
+   background: url(../wall.jpg) black center 100%  no-repeat fixed;
    font-family: "Raleway";
   margin: 0;
 }
@@ -5037,9 +5035,6 @@ a.list-group-item-danger.active:focus {
   border-bottom-color: transparent;
 }
 .well {
-  min-height: 10px;
-  padding: 10px;
-  margin-bottom: 10px;
   background-color: #4e5d6c;
   border: 1px solid transparent;
   border-radius: 6;
@@ -5968,17 +5963,23 @@ label,
 }
 
 .dissidia {
-  min-height: 20px;
-  padding: 19px;
-  margin-bottom: 20px;
+  border: 1px solid tranparent;
+  border-radius: 10;
+  padding: 30px;
   background-color: #4e5d6c;
+}
+
+.gdivider{
+    width: auto;
+    border-top: 1px solid #f8f8f8;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .intros{
   min-height: 10px;
   font-size: 16px;
   padding: 5px;
-  color: rgba(241, 196, 15,1.0);
+  color: rgba(255, 255, 255,1.0);
   text-shadow: 3px 3px 10px black ;
   background-color: rgba(255, 255, 255,0.2);
   border: 1px solid transparent;
