@@ -37,14 +37,15 @@ if ($_POST) {
     $mDesc = filter_var($_POST["description"], FILTER_SANITIZE_STRING);
     $mType = filter_var($_POST["type"], FILTER_SANITIZE_STRING);
     $mAddress = filter_var($_POST["address"], FILTER_SANITIZE_STRING);
+    $mDate = filter_var($_POST["date"], FILTER_SANITIZE_STRING);
 
-    $results = $mysqli->query("INSERT INTO markers (description, lat, lng, type, address) VALUES ('$mDesc',$mLat, $mLng, '$mType', '$mAddress')");
+    $results = $mysqli->query("INSERT INTO markers (description, lat, lng, type, address, date) VALUES ('$mDesc',$mLat, $mLng, '$mType', '$mAddress', '$mDate')");
     if (!$results) {
         header('HTTP/1.1 500 Error: Could not create marker!');
         exit();
     }
 
-    $output = '<h3 class="marker-heading">' . $mType . '</h3><p>' . $mAddress . '</p><hr><p>' . $mDesc .'</p>';
+    $output = '<h3 class="marker-heading">' . $mType . '</h3><h6>' . $mDate. '</h6><p>' . $mAddress . '</p><hr><p>' . $mDesc .'</p>';
     exit($output);
 }
 
@@ -71,6 +72,7 @@ while ($obj = $results->fetch_object()) {
     $newnode->setAttribute("lng", $obj->lng);
     $newnode->setAttribute("type", $obj->type);
     $newnode->setAttribute("Address", $obj->Address);
+    $newnode->setAttribute("date", $obj->date);
 }
 echo $dom->saveXML();
 ?>

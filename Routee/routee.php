@@ -9,9 +9,8 @@
         <meta name="author" content="">
 
         <link href="css/simple.css" rel="stylesheet">        
-        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
-
+        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false&libraries=places"></script>        
+        
         <?php
         try {
             if (!empty($_REQUEST['pType']) && !empty($_REQUEST['placeName']) && !empty($_REQUEST['pDesc'])) {
@@ -23,6 +22,7 @@
             
         }
         ?>
+    
         <script>
             var map;
             var centerOfMap = new google.maps.LatLng(14.56486, 120.99370);
@@ -31,12 +31,12 @@
             var startLocation;
             var destinationLocation;
             var waypts = [];
-			var events = [];
-            var currLetter = 65
+
+            var currLetter = 65;
             var markers = [];
 
             //Existing points
-            var Existing_points = new Array();
+            var events = new Array();
             var directionsDisplay;
             var directionsService = new google.maps.DirectionsService();
             function initialize() {
@@ -60,7 +60,7 @@
                 var type = '<?php echo $type; ?>';
                 var desc = '<?php echo $Description ?>';
 
-                if (place != '' && type != '' && desc != '')
+                if (place !== '' && type !== '' && desc !== '')
                 {
                     $.ajax({
                         url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + place + "&sensor=false",
@@ -72,7 +72,7 @@
 
                             map.setCenter(pos);
                             var typeConcat;
-                            if (type == "Accident")
+                            if (type === "Accident")
                             {
                                 typeConcat = '<option value="Accident" selected= "selected">Accident</option>' +
                                         '<option value="Flood">Flood</option>' +
@@ -80,7 +80,7 @@
                                         '<option value="Heavy Traffic">Heavy Traffic</option>' +
                                         '<option value="Others">Others</option>';
                             }
-                            else if (type == "Flood")
+                            else if (type === "Flood")
                             {
                                 typeConcat = '<option value="Accident" >Accident</option>' +
                                         '<option value="Flood" selected= "selected">Flood</option>' +
@@ -88,7 +88,7 @@
                                         '<option value="Heavy Traffic">Heavy Traffic</option>' +
                                         '<option value="Others">Others</option>';
                             }
-                            else if (type == "Construction")
+                            else if (type === "Construction")
                             {
                                 typeConcat = '<option value="Accident" >Accident</option>' +
                                         '<option value="Flood" >Flood</option>' +
@@ -97,7 +97,7 @@
                                         '<option value="Others">Others</option>';
                             }
 
-                            else if (type == "Heavy Traffic")
+                            else if (type === "Heavy Traffic")
                             {
                                 typeConcat = '<option value="Accident" >Accident</option>' +
                                         '<option value="Flood" >Flood</option>' +
@@ -132,8 +132,10 @@
                     $(data).find("marker").each(function() {
 
                         var type = $(this).attr('type');
-                        var desc = '<p>' + $(this).attr('Address') + '</p><hr>'+'<p>' + $(this).attr('description') + '</p>';
-                        var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));                        
+                        var date = $(this).attr('date');
+                        date = date.split(" ");
+                        var desc = '<h6> Date:  ' + date[0] + '  Time:  ' + date[1] + ' </h6>' + $(this).attr('Address') + '</p><hr>' + '<p>' + $(this).attr('description') + '</p>';
+                        var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));
                         var iconPath;
 
                         if (type === "Accident")
@@ -144,32 +146,32 @@
                             iconPath = "images/custom_markers/marker_traffic.png";
                         else
                             iconPath = "images/custom_markers/marker_others.png";
-                        Existing_points.push(point);
+                        events.push(point);
                         add_marker(point, type, desc, true, false, false, iconPath);
                     });
                 });
                 //Right Click to Drop a New Marker
                 google.maps.event.addListener(map, 'rightclick', function(event) {
-                
+
                     geocoder.geocode({'latLng': event.latLng}, function(results, status) {
-                        if (status == google.maps.GeocoderStatus.OK) {                           
-                           var address= results[0].formatted_address;
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            var address = results[0].formatted_address;
                         }
                         else {
                             alert("Geocoder failed due to: " + status);
                         }
-                    //form to be displayed with new marker
-                    var Report_Form = '<p><div class="marker-edit">' +
-                            '<form action="ajax-save.php" method="POST" name="SaveMarker" id="SaveMarker">' +
-                            '<label for="pAddress"><span>Address :</span> <textarea disabled name="address_ta" class="save-add" maxlength="200" placeholder= "Address">' + address + '</textarea></label>' +
-                            '<label for="pType"><span>Area Type :</span> <select name="pType" class="save-type"><option value="Accident">Accident</option><option value="Flood">Flood</option>' +
-                            '<option value="Construction">Construction</option><option value="Heavy Traffic">Heavy Traffic</option><option value="Others">Others</option></select></label>' +
-                            '<label for="pDesc"><span>What Happened here ?</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200"></textarea></label>' +
-                            '</form>' +
-                            '</div></p><button name="save-marker" class="save-marker">Save Report!</button>';
+                        //form to be displayed with new marker
+                        var Report_Form = '<p><div class="marker-edit">' +
+                                '<form action="ajax-save.php" method="POST" name="SaveMarker" id="SaveMarker">' +
+                                '<label for="pAddress"><span>Address :</span> <textarea disabled name="address_ta" class="save-add" maxlength="200" placeholder= "Address">' + address + '</textarea></label>' +
+                                '<label for="pType"><span>Area Type :</span> <select name="pType" class="save-type"><option value="Accident">Accident</option><option value="Flood">Flood</option>' +
+                                '<option value="Construction">Construction</option><option value="Heavy Traffic">Heavy Traffic</option><option value="Others">Others</option></select></label>' +
+                                '<label for="pDesc"><span>What Happened here ?</span><textarea name="pDesc" class="save-desc" placeholder="Enter Details" maxlength="200"></textarea></label>' +
+                                '</form>' +
+                                '</div></p><button name="save-marker" class="save-marker">Save Report!</button>';
 
-                    add_marker(event.latLng, 'Report Area', Report_Form, true, false, true, "");
-                     });
+                        add_marker(event.latLng, 'Report Area', Report_Form, true, false, true, "");
+                    });
                 });
 
                 // -------------- AUTCOMPLETE ----------------------//
@@ -219,7 +221,7 @@
                 var contentString = $('<div class="marker-info-win">' +
                         '<div class="marker-inner-win"><span class="info-content">' +
                         '<h3 class="marker-heading">' + MapTitle + '</h3>' +
-                        MapDesc + 
+                        MapDesc +
                         '</span><button name="remove-marker" class="remove-marker" title="Remove Marker">Remove Marker</button>' +
                         '</div></div>');
 
@@ -262,14 +264,54 @@
                 });
             }
 
-           
+            function placeMarker(location) {
+                var image;
+
+                if (startIsSet === true) {
+
+                    image = "images/markers/brown_Marker";
+                    image = image.concat(String.fromCharCode(currLetter++));
+                    image = image.concat(".png");
+
+                    var marker = new google.maps.Marker({
+                        position: destinationLocation,
+                        map: map,
+                        icon: image
+                    });
+                    startIsSet = false;
+
+                } else {
+                    image = "images/markers/blue_Marker";
+                    image = image.concat(String.fromCharCode(currLetter));
+                    image = image.concat(".png");
+
+                    var marker = new google.maps.Marker({
+                        position: startLocation,
+                        map: map,
+                        icon: image
+
+                    });
+                    startIsSet = true;
+                }
+                markers.push(marker);
+
+            }
             //------------------SAVE MARKER TO DB FUNCTION---------------------------
             function save_marker(Marker, mDesc, mType, replaceWin, mAddress)
             {
                 //Save new marker using jQuery Ajax
-                var mLatLang = Marker.getPosition().toUrlValue();                                                
+                var mLatLang = Marker.getPosition().toUrlValue();
+                var date = new Date();
+                date = date.getYear() + '-' +
+                        ('00' + (date.getMonth() + 1)).slice(-2) + '-' +
+                        ('00' + date.getDate()).slice(-2) + ' ' +
+                        ('00' + date.getHours()).slice(-2) + ':' +
+                        ('00' + date.getMinutes()).slice(-2) + ':' +
+                        ('00' + date.getSeconds()).slice(-2);
+                console.log(mLatLang);
+                console.log(date);
 
-                var myData = {description: mDesc, latlang: mLatLang, type: mType, address: mAddress};
+                var myData = {description: mDesc, latlang: mLatLang, type: mType, address: mAddress, date: date};
                 var iconPath;
                 if (mType === "Accident")
                     iconPath = "images/custom_markers/marker_accident.png";
@@ -322,18 +364,19 @@
             }
 
 
-           function routeAddress() {
+            function routeAddress() {
                 var source = document.getElementById("sourceTextBox").value;
                 var destination = document.getElementById("destinationTextBox").value;
+
                 geocoder.geocode({'address': source}, function(results, status) {
-                    if (status == google.maps.GeocoderStatus.OK) {
+                    if (status === google.maps.GeocoderStatus.OK) {
                         startLocation = results[0].geometry.location;
-                       
+
 
                         geocoder.geocode({'address': destination}, function(results, status) {
-                            if (status == google.maps.GeocoderStatus.OK) {
+                            if (status === google.maps.GeocoderStatus.OK) {
                                 destinationLocation = results[0].geometry.location;
-                                
+
                                 var request = {
                                     origin: startLocation,
                                     destination: destinationLocation,
@@ -342,66 +385,68 @@
                                 };
 
                                 directionsService.route(request, function(response, status) {
-                                    if (status == google.maps.DirectionsStatus.OK) {
-                                    	alert(response.routes.length);
-                                       	var index = 0;
-										response.routes.forEach(function(route){
-											var rendererOptions = {
-											    preserveViewport: true,         
-											    routeIndex:index
-											};
-											directionsService = new google.maps.DirectionsService();
-											var request = {
-										        origin: startLocation,
-										        destination: destinationLocation,
-										        travelMode: google.maps.TravelMode.DRIVING
-										    };
-										    directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
-										    directionsDisplay.setOptions({directions:response,routeIndex:index});
-					    					directionsDisplay.setMap(map);
-					    					
-					    					 directionsService.route(request, function(result, status) {
-											       
-											
-											        if (status == google.maps.DirectionsStatus.OK) {
-											        	var polyline = new google.maps.Polyline({
-														    path: [],
-															strokeColor: '#FF0000',
-															strokeWeight: 3
-														});
-														var bounds = new google.maps.LatLngBounds();
-														
-														
-														var legs = response.routes[index++].legs;
-														for (i=0;i<legs.length;i++) {
-														  var steps = legs[i].steps;
-														  for (j=0;j<steps.length;j++) {
-														    var nextSegment = steps[j].path;
-														    for (k=0;k<nextSegment.length;k++) {
-														      polyline.getPath().push(nextSegment[k]);
-														      bounds.extend(nextSegment[k]);
-														    }
-														  }
-														}
+                                    if (status === google.maps.DirectionsStatus.OK) {
+                                        alert(response.routes.length);
+                                        var index = 0;
+                                        response.routes.forEach(function(route) {
+                                            var rendererOptions = {
+                                                preserveViewport: true,
+                                                routeIndex: index
+                                            };
+                                            directionsService = new google.maps.DirectionsService();
+                                            var request = {
+                                                origin: startLocation,
+                                                destination: destinationLocation,
+                                                travelMode: google.maps.TravelMode.DRIVING
+                                            };
+                                            directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+                                            directionsDisplay.setOptions({directions: response, routeIndex: index});
+                                            directionsDisplay.setMap(map);
+                                            index++;
+                                            directionsService.route(request, function(result, status) {
 
-														events.forEach(function(element, index) {
 
-															    if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
-															            console.log(element + " YES");
-															    } else {
-															            console.log(element + " not on edge");
-															    }
-														   		
-														});
+                                                if (status === google.maps.DirectionsStatus.OK) {
+                                                    var polyline = new google.maps.Polyline({
+                                                        path: [],
+                                                        strokeColor: '#FF0000',
+                                                        strokeWeight: 3
+                                                    });
+                                                    var bounds = new google.maps.LatLngBounds();
 
-											           	directionsDisplay.setDirections(result);
-											        }
-											 });
-											
-											
-										});
-                                       
-                                       
+
+                                                    var legs = response.routes[index].legs;
+                                                    for (i = 0; i < legs.length; i++) {
+                                                        var steps = legs[i].steps;
+                                                        for (j = 0; j < steps.length; j++) {
+                                                            var nextSegment = steps[j].path;
+                                                            for (k = 0; k < nextSegment.length; k++) {
+                                                                polyline.getPath().push(nextSegment[k]);
+                                                                bounds.extend(nextSegment[k]);
+                                                            }
+                                                        }
+                                                    }
+
+                                                    events.forEach(function(element, index) {
+
+                                                        if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
+                                                            console.log(element + " YES");
+                                                        } else {
+                                                            console.log(element + " not on edge");
+                                                        }
+
+                                                    });
+
+                                                    directionsDisplay.setDirections(result);
+
+
+                                                }
+                                            });
+
+
+                                        });
+
+
                                     } else
                                         alert("Routing failed!");
 
@@ -414,24 +459,6 @@
                 });
 
             }
-
-            function createPolyline(directionResult) {
-                var line = new google.maps.Polyline({
-                    path: directionResult.routes[0].overview_path, strokeColor: '#FF0000',
-                    strokeOpacity: 0.5,
-                    strokeWeight: 4
-                });
-                line.setMap(map);
-                for (var i = 0; i < line.getPath().length; i++) {
-                    var marker = new google.maps.Marker({
-                        icon: {path: google.maps.SymbolPath.CIRCLE, scale: 3},
-                        position: line.getPath().getAt(i),
-                        map: map
-                    });
-                }
-            }
-
-
 
             google.maps.event.addDomListener(window, 'load', initialize);
             google.maps.event.addDomListener(window, "resize", function() {

@@ -31,8 +31,9 @@ CREATE TABLE `markers` (
   `lng` float(10,6) NOT NULL,
   `type` varchar(50) NOT NULL,
   `Address` varchar(90) NOT NULL,
+  `date` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=43 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +42,7 @@ CREATE TABLE `markers` (
 
 LOCK TABLES `markers` WRITE;
 /*!40000 ALTER TABLE `markers` DISABLE KEYS */;
-INSERT INTO `markers` VALUES (38,'ddsadd',14.445153,120.992912,'Accident','Alabang-Zapote Road, Las Piñas, Metro Manila'),(39,'ssssxasxsax',14.455501,120.969002,'Accident','Molino Road, Bacoor City, Philippines'),(40,'sadasdasd',14.468425,120.980499,'Heavy Traffic','Naga Road, Las Pinas, Philippines'),(41,'czxcccxzc',14.479146,120.997971,'Accident','Dr. A. Santos Avenue, Parañaque, Philippines'),(42,'xasxasx',14.498425,120.992775,'Others','San Dionisio, Parañaque, Philippines');
+INSERT INTO `markers` VALUES (38,'ddsadd',14.445153,120.992912,'Accident','Alabang-Zapote Road, Las Piñas, Metro Manila','0000-00-00 00:00:00'),(39,'ssssxasxsax',14.455501,120.969002,'Accident','Molino Road, Bacoor City, Philippines','0000-00-00 00:00:00'),(43,'Car crash boom boom boom',14.461786,120.962845,'Accident','Emilio Aguinaldo Highway, Bacoor City, Philippines','0000-00-00 00:00:00'),(42,'xasxasx',14.498425,120.992775,'Others','San Dionisio, Parañaque, Philippines','0000-00-00 00:00:00'),(44,'oh no',14.475655,121.000671,'Accident','8166 int 5 espiritu compound Dr. A. Santos Avenue, Parañaque, Philippines','2014-03-22 11:21:33');
 /*!40000 ALTER TABLE `markers` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-03-16 22:32:27
+-- Dump completed on 2014-03-22 19:38:50
