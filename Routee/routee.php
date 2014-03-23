@@ -10,7 +10,7 @@
 
         <link href="css/simple.css" rel="stylesheet">        
         <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false&libraries=places"></script>        
-        
+
         <?php
         try {
             if (!empty($_REQUEST['pType']) && !empty($_REQUEST['placeName']) && !empty($_REQUEST['pDesc'])) {
@@ -22,7 +22,7 @@
             
         }
         ?>
-    
+
         <script>
             var map;
             var centerOfMap = new google.maps.LatLng(14.56486, 120.99370);
@@ -37,8 +37,12 @@
 
             //Existing points
             var events = new Array();
+            var eventDates = new Array();
             var directionsDisplay;
             var directionsService = new google.maps.DirectionsService();
+
+
+
             function initialize() {
                 directionsDisplay = new google.maps.DirectionsRenderer();
                 geocoder = new google.maps.Geocoder();
@@ -66,8 +70,7 @@
                         url: "http://maps.googleapis.com/maps/api/geocode/json?address=" + place + "&sensor=false",
                         type: "POST",
                         success: function(res) {
-                            console.log(res.results[0].geometry.location.lat);
-                            console.log(res.results[0].geometry.location.lng);
+
                             var pos = new google.maps.LatLng(res.results[0].geometry.location.lat, res.results[0].geometry.location.lng);
 
                             map.setCenter(pos);
@@ -133,6 +136,7 @@
 
                         var type = $(this).attr('type');
                         var date = $(this).attr('date');
+                        var date_events = $(this).attr('date');
                         date = date.split(" ");
                         var desc = '<h6> Date:  ' + date[0] + '  Time:  ' + date[1] + ' </h6>' + $(this).attr('Address') + '</p><hr>' + '<p>' + $(this).attr('description') + '</p>';
                         var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));
@@ -147,6 +151,8 @@
                         else
                             iconPath = "images/custom_markers/marker_others.png";
                         events.push(point);
+                        eventDates.push(date_events + " " + type + " " + point);
+
                         add_marker(point, type, desc, true, false, false, iconPath);
                     });
                 });
@@ -198,10 +204,93 @@
                     var place = autocomplete2.getPlace();
                 });
 
+
                 setupClickListener('changetype-all', []);
                 google.maps.event.addDomListener(window, 'load', initialize);
+
             }
 
+
+
+            /*----------------- AUTO DELETION SCRIPTS  ------------------*/
+            /*----------------- RUNS EVERY MIDNIGHT FOR TYPES [CONSTRUCTION, FLOOD AND OTHERS]  ------------------*/
+            var now = new Date();
+            var timeForRefresh = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0) - now;
+
+            if (timeForRefresh < 0)
+            {
+                timeForRefresh += 86400000;
+            }
+            var six_hours = 21600000;
+
+            /*Time function per 24 hours at 00:00*/
+            setTimeout(function() {
+
+                for (var i = 0; i < eventDates.length; i++)
+                {
+                    refreshDel(eventDates[i], i);
+                }
+
+            }, timeForRefresh);
+            /*Interval function per 6 hours*/
+            setInterval(function() {
+
+                for (var i = 0; i < eventDates.length; i++)
+                {
+                    refreshDel(eventDates[i], i);
+                }
+
+
+            }, six_hours);
+
+            /*----------------- DELETION SUPPORT FUNCTION ------------------*/
+            function refreshDel(date_event, index)
+            {
+                var oneDay = 24 * 60 * 60 * 1000;
+                date_event = date_event.split(" ");
+                var parts_date = date_event[0].split("-");
+                var parts_time = date_event[1].split(":");
+                var query_date = new Date(parts_date[0], parts_date[1] - 1, parts_date[2], parts_time[0], parts_time[1], parts_time[2]);
+                var diffDays = Math.round(Math.abs((now.getTime() - query_date.getTime()) / (oneDay)));
+
+                var oneHour = 3600000;
+                var diffHours = Math.round(Math.abs((now.getTime() - query_date.getTime()) / (oneHour)));
+
+
+                type = date_event[2];
+
+                if (diffDays >= 1 && (type === "Flood" || type === "Construction" || type === "Others"))
+                {
+                    var pos = events[index];
+                    var marker = new google.maps.Marker({
+                        position: pos,
+                        draggable: false
+                    });
+                    remove_marker(marker);
+                    events.pop(events[index]);
+                    eventDates.pop(date_event);
+                } else if (diffDays < 1 && diffHours >= 2 && type === "Heavy Traffic")
+                {
+                    var pos = events[index];
+                    var marker = new google.maps.Marker({
+                        position: pos,
+                        draggable: false
+                    });
+                    remove_marker(marker);
+                    events.pop(events[index]);
+                    eventDates.pop(date_event);
+                } else if (diffDays < 1 && diffHours >= 4 && type === "Accident")
+                {
+                    var pos = events[index];
+                    var marker = new google.maps.Marker({
+                        position: pos,
+                        draggable: false
+                    });
+                    remove_marker(marker);
+                    events.pop(events[index]);
+                    eventDates.pop(date_event);
+                }
+            }
 
 
             //------------------ADD MARKER FUNCTION---------------------------
@@ -224,6 +313,7 @@
                         MapDesc +
                         '</span><button name="remove-marker" class="remove-marker" title="Remove Marker">Remove Marker</button>' +
                         '</div></div>');
+
 
 
                 var markerinfowindow = new google.maps.InfoWindow();
@@ -302,7 +392,7 @@
                 //Save new marker using jQuery Ajax
                 var mLatLang = Marker.getPosition().toUrlValue();
                 var date = new Date();
-                date = date.getYear() + '-' +
+                date = date.getFullYear() + '-' +
                         ('00' + (date.getMonth() + 1)).slice(-2) + '-' +
                         ('00' + date.getDate()).slice(-2) + ' ' +
                         ('00' + date.getHours()).slice(-2) + ':' +
@@ -354,7 +444,6 @@
                         data: myData,
                         success: function(data) {
                             Marker.setMap(null);
-                            alert("Report Removed!");
                         },
                         error: function(xhr, ajaxOptions, thrownError) {
                             alert(thrownError); //throw any errors
