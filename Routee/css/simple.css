@@ -29,6 +29,48 @@ section,
 summary {
     display: block;
 }
+
+/*added css start*/
+
+@-webkit-keyframes movemap {
+     
+	from {margin-right:0px;}	
+	to {margin-right:280px;
+	
+	}
+	
+      
+       
+     
+}
+#map-content{
+	height: 100%;
+	
+}
+#wrapper{
+	position:inherit;
+	
+	float:right;
+}
+
+#map-canvas{
+	height: 100%;	
+}
+#directions-panel {
+	
+	position:fixed;
+    width:280px;
+    height:100%;
+    overflow:scroll;
+    z-index:10;
+ 
+  
+}
+
+/*added css end*/
+
+
+
 audio,
 canvas,
 progress,
