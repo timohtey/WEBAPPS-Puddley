@@ -459,12 +459,12 @@
                 geocoder.geocode({'address': source}, function(results, status) {
                     if (status == google.maps.GeocoderStatus.OK) {
                         startLocation = results[0].geometry.location;
-                       
+
 
                         geocoder.geocode({'address': destination}, function(results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 destinationLocation = results[0].geometry.location;
-                                
+
                                 var request = {
                                     origin: startLocation,
                                     destination: destinationLocation,
@@ -474,76 +474,70 @@
 
                                 directionsService.route(request, function(response, status) {
                                     if (status == google.maps.DirectionsStatus.OK) {
-                                    	/*alert(response.routes.length);*/
-                                       	var index = 0;
-                                       	var bounds;
-                                       	
-										response.routes.forEach(function(route){
-											var rendererOptions = {
-											    preserveViewport: true,         
-											    
-											};
-											directionsService = new google.maps.DirectionsService();
-											var request = {
-										        origin: startLocation,
-										        destination: destinationLocation,
-										        travelMode: google.maps.TravelMode.DRIVING
-										    };
-										  
-					    					 
-   	
-											var polyline = new google.maps.Polyline({
-												path: [],
-												strokeColor: '#FF0000',
-												strokeWeight: 3
-											});
-											bounds = new google.maps.LatLngBounds();
-														
-												
-											var legs = response.routes[index++].legs;
-											if(index == 0){
-												center = legs.start_location;
-											}		
-											for (i=0;i<legs.length;i++) {
-												var steps = legs[i].steps;
-												for (j=0;j<steps.length;j++) {
-													var nextSegment = steps[j].path;
-												    for (k=0;k<nextSegment.length;k++) {
-														  polyline.getPath().push(nextSegment[k]);
-														  bounds.extend(nextSegment[k]);
-													}
-												}
-											}
-											var count=0;
-											events.forEach(function(element, index) {
-													
-													if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
-															console.log(element + " YES");
-															count++;
-													} else {
-															console.log(element + " not on edge");
-													}
-														   		
-											});
+                                        /*alert(response.routes.length);*/
+                                        var index = 0;
+                                        var bounds;
 
-											      	
-											directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
-											directionsDisplay.setOptions({directions:response,routeIndex:index});
-							    			directionsDisplay.setMap(map);
-							    			
-							    			
-					    					       
-											
-											
-											
-										});
-										
-                                       /* - edit panel to display count somewhere here
-                                          - sets directions panel
-                                        */     
-                                       document.getElementById('directions-panel').innerHTML = "";
-							    	   directionsDisplay.setPanel(document.getElementById('directions-panel'));
-                                       map.fitBounds(bounds);
+                                        response.routes.forEach(function(route) {
+                                            var rendererOptions = {
+                                                preserveViewport: true,
+                                            };
+                                            directionsService = new google.maps.DirectionsService();
+                                            var request = {
+                                                origin: startLocation,
+                                                destination: destinationLocation,
+                                                travelMode: google.maps.TravelMode.DRIVING
+                                            };
+
+
+
+                                            var polyline = new google.maps.Polyline({
+                                                path: [],
+                                                strokeColor: '#FF0000',
+                                                strokeWeight: 3
+                                            });
+                                            bounds = new google.maps.LatLngBounds();
+
+
+                                            var legs = response.routes[index++].legs;
+                                            if (index == 0) {
+                                                center = legs.start_location;
+                                            }
+                                            for (i = 0; i < legs.length; i++) {
+                                                var steps = legs[i].steps;
+                                                for (j = 0; j < steps.length; j++) {
+                                                    var nextSegment = steps[j].path;
+                                                    for (k = 0; k < nextSegment.length; k++) {
+                                                        polyline.getPath().push(nextSegment[k]);
+                                                        bounds.extend(nextSegment[k]);
+                                                    }
+                                                }
+                                            }
+                                            var count = 0;
+                                            events.forEach(function(element, index) {
+
+                                                if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
+                                                    console.log(element + " YES");
+                                                    count++;
+                                                } else {
+                                                    console.log(element + " not on edge");
+                                                }
+
+                                            });
+
+
+                                            directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+                                            directionsDisplay.setOptions({directions: response, routeIndex: index});
+                                            directionsDisplay.setMap(map);
+
+                                        });
+
+                                        /* - edit panel to display count somewhere here
+                                         - sets directions panel
+                                         */
+                                        document.getElementById('directions-panel').innerHTML = "";
+                                        directionsDisplay.setPanel(document.getElementById('directions-panel'));
+                                        map.fitBounds(bounds);
                                     } else
                                         alert("Routing failed!");
 
@@ -556,27 +550,27 @@
                 });
 
             }
-            
+
             /*calls css map animation*/
-            function popsidebar(mapcvs){
-            	
-		            mapcvs.style.webkitAnimationName = 'movemap';
-		            mapcvs.style.webkitAnimationDuration = '1s';
-		
-		          
-		            setTimeout(function() {
-		                mapcvs.style.webkitAnimationName = '';
-		                mapcvs.style.marginRight="280px";
-		            }, 1000);
+            function popsidebar(mapcvs) {
+
+                mapcvs.style.webkitAnimationName = 'movemap';
+                mapcvs.style.webkitAnimationDuration = '1s';
+
+
+                setTimeout(function() {
+                    mapcvs.style.webkitAnimationName = '';
+                    mapcvs.style.marginRight = "280px";
+                }, 1000);
 
             }
-            
+
             /*event listener for button click - launches animation and routes*/
-			window.onload = function(){
-            	document.getElementById('findItButton').onclick=function(){
-            			routeAddress();
-            			popsidebar(document.getElementById('map-content'));
-            		};
+            window.onload = function() {
+                document.getElementById('findItButton').onclick = function() {
+                    routeAddress();
+                    popsidebar(document.getElementById('map-content'));
+                };
             }
             google.maps.event.addDomListener(window, 'load', initialize);
             google.maps.event.addDomListener(window, "resize", function() {
@@ -585,14 +579,12 @@
                 map.setCenter(center);
             });
         </script>     
-
-
     </head>
     <body >
 
         <div class = "navbar navbar-default navbar-fixed-top">
             <div class = "container">
-                <a href = "#" class = "navbar-brand">Routee</a>
+                <a href = "index.php" class = "navbar-brand"><img src="images/routee.png" style="height: 20px; width: 20px"></a>
                 <button class = "navbar-toggle" data-toggle = "collapse" data-target = ".navHeaderCollapse">
                     <span class = "icon-bar"></span>
                     <span class = "icon-bar"></span>
@@ -620,9 +612,9 @@
         <div id="map-content">
             <div id="map-canvas" class="col-lg-12"></div>
             <div id="wrapper">
-            	
-            	<div id="directions-panel"></div>
-            	<div style="clear: both;"></div>
+
+                <div id="directions-panel"></div>
+                <div style="clear: both;"></div>
             </div>
         </div>
 
