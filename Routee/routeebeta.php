@@ -593,15 +593,17 @@
             </div>
         </div>
 
-        <div class = "col-lg-8">
-            <div id="map-canvas"></div>
-        </div>
-        <div class = "col-lg-4">
-            <div class = "well">
+		
+		<div class = "col-lg-4">
+		<div class = "well">
                 <h3> Reserved for directions module </h3>
-            </div>
-         </div>
-
+		</div>
+		</div>
+		<div class = "col-lg-8">
+		<div class = "appear">
+		<div id="map-canvas"></div>
+		</div>
+		</div>
 
 	<script src="js/jquery-1.10.2.js"></script>
     <script src = "js/bootstrap.js"></script>
