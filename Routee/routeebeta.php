@@ -546,7 +546,7 @@
                         <div class="media">
                             
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_accident.png">
+                                <img class="media-object" src="images/custom_markers/accident_SD.png">
                              </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Accident</h4>
@@ -554,7 +554,7 @@
                             </div>
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_construction.png">
+                                <img class="media-object" src="images/custom_markers/construction_SD.png">
                              </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Construction</h4>
@@ -562,7 +562,7 @@
                             </div>
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_flood.png">
+                                <img class="media-object" src="images/custom_markers/flood_SD.png">
                              </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Flood</h4>
@@ -570,7 +570,7 @@
                             </div>
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_traffic.png">
+                                <img class="media-object" src="images/custom_markers/traffic_SD.png">
                              </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Traffic</h4>
@@ -578,7 +578,7 @@
                             </div>
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_others.png">
+                                <img class="media-object" src="images/custom_markers/other_SD.png">
                              </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Others</h4>
