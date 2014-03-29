@@ -6158,7 +6158,7 @@ button.save-marker, button.remove-marker
     cursor: pointer;
 }
 /*Routee.php custom styles*/
-html, body,#map-canvas {
+html, body,#map-canvas, #sm-map-canvas {
     height: 100%;
     margin: 0px;
     padding-top: 25px;
@@ -6229,9 +6229,19 @@ html, body,#map-canvas {
 }
 
 @media (max-width: 500px) {
+
 .appear{
  display:none;
 }
+
+}
+
+@media (min-width: 500px) {
+
+.linkappear{
+ display: none;
+}
+
 }
 
 

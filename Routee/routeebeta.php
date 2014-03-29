@@ -51,6 +51,7 @@
 
                 };
                 map = new google.maps.Map(document.getElementById('map-canvas'), mapInitialize);
+                 map = new google.maps.Map(document.getElementById('sm-map-canvas'), mapInitialize);
 
 
                 directionsDisplay.setMap(map);
@@ -595,15 +596,41 @@
 
 		
 		<div class = "col-lg-4">
-		<div class = "well">
+		
+        <div class = "well appear">
                 <h3> Reserved for directions module </h3>
 		</div>
+
+        <div class = "linkappear">
+
+        <ul class = "nav nav-tabs">
+            <li><a href = "#tab1" data-toggle="tab">Directions</a></li>
+            <li><a href = "#tab2" data-toggle="tab">Map View</a></li>
+        </ul>
+
+        <div class = "tab-content">     
+            <div class = "tab-pane active" id ="tab1">
+                <h3> Directions </h3>
+            </div>
+
+            <div class = "tab-pane" id ="tab2">
+                <div id="sm-map-canvas"></div>
+            </div>
+
+        </div>
 		</div>
+
+        </div>
+
 		<div class = "col-lg-8">
-		<div class = "appear">
-		<div id="map-canvas"></div>
-		</div>
-		</div>
+		
+        <div class = "appear">
+        <div id="map-canvas"></div>
+        </div>
+		
+        </div>
+
+
 
 	<script src="js/jquery-1.10.2.js"></script>
     <script src = "js/bootstrap.js"></script>
