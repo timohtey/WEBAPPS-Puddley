@@ -19,6 +19,18 @@
                 $type = $_REQUEST['pType'];
                 $place = $_REQUEST['placeName'];
                 $Description = $_REQUEST['pDesc'];
+            } else {
+                $type = '';
+                $place = '';
+                $Description = '';
+            }
+
+            if (!empty($_REQUEST['sourceField']) && $_REQUEST['destinationField']) {
+                $source = $_REQUEST['sourceField'];
+                $destination = $_REQUEST['destinationField'];
+            } else {
+                 $source = 'From where?';
+                $destination = 'To where?';
             }
         } catch (Exception $e) {
             
@@ -51,12 +63,9 @@
 
                 };
                 map = new google.maps.Map(document.getElementById('map-canvas'), mapInitialize);
-                 map = new google.maps.Map(document.getElementById('sm-map-canvas'), mapInitialize);
-
 
                 directionsDisplay.setMap(map);
                 directionsDisplay.setOptions({suppressMarkers: true});
-
 
                 var place = '<?php echo $place; ?>';
                 var type = '<?php echo $type; ?>';
@@ -266,38 +275,7 @@
                 });
             }
 
-            function placeMarker(location) {
-                var image;
-
-                if (startIsSet === true) {
-
-                    image = "images/markers/brown_Marker";
-                    image = image.concat(String.fromCharCode(currLetter++));
-                    image = image.concat(".png");
-
-                    var marker = new google.maps.Marker({
-                        position: destinationLocation,
-                        map: map,
-                        icon: image
-                    });
-                    startIsSet = false;
-
-                } else {
-                    image = "images/markers/blue_Marker";
-                    image = image.concat(String.fromCharCode(currLetter));
-                    image = image.concat(".png");
-
-                    var marker = new google.maps.Marker({
-                        position: startLocation,
-                        map: map,
-                        icon: image
-
-                    });
-                    startIsSet = true;
-                }
-                markers.push(marker);
-
-            }
+            
             //------------------SAVE MARKER TO DB FUNCTION---------------------------
             function save_marker(Marker, mDesc, mType, replaceWin, mAddress)
             {
@@ -365,20 +343,23 @@
                 }
             }
 
-
+			//VARIABLES FROM INDEX PHP INPUT
+            var source = '<?php echo $source; ?>';
+            var destination = '<?php echo $destination; ?>';
+            
             function routeAddress() {
-                var source = document.getElementById("sourceTextBox").value;
-                var destination = document.getElementById("destinationTextBox").value;
-
+                source = document.getElementById('sourceTextBox').value;
+                destination = document.getElementById('destinationTextBox').value;
+                
                 geocoder.geocode({'address': source}, function(results, status) {
-                    if (status === google.maps.GeocoderStatus.OK) {
+                    if (status == google.maps.GeocoderStatus.OK) {
                         startLocation = results[0].geometry.location;
-
+                       
 
                         geocoder.geocode({'address': destination}, function(results, status) {
-                            if (status === google.maps.GeocoderStatus.OK) {
+                            if (status == google.maps.GeocoderStatus.OK) {
                                 destinationLocation = results[0].geometry.location;
-
+                                
                                 var request = {
                                     origin: startLocation,
                                     destination: destinationLocation,
@@ -387,68 +368,110 @@
                                 };
 
                                 directionsService.route(request, function(response, status) {
-                                    if (status === google.maps.DirectionsStatus.OK) {
-                                        alert(response.routes.length);
-                                        var index = 0;
-                                        response.routes.forEach(function(route) {
-                                            var rendererOptions = {
-                                                preserveViewport: true,
-                                                routeIndex: index
-                                            };
-                                            directionsService = new google.maps.DirectionsService();
-                                            var request = {
-                                                origin: startLocation,
-                                                destination: destinationLocation,
-                                                travelMode: google.maps.TravelMode.DRIVING
-                                            };
-                                            directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
-                                            directionsDisplay.setOptions({directions: response, routeIndex: index});
-                                            directionsDisplay.setMap(map);
-                                            index++;
-                                            directionsService.route(request, function(result, status) {
+                                    if (status == google.maps.DirectionsStatus.OK) {
+                                    	//alert(response.routes.length);
+                                       	var index = 0;
+                                       	var colorindex=0;
+                                       	var bounds;
+                                       	
+										response.routes.forEach(function(route){
+											
+											directionsService = new google.maps.DirectionsService();
+											var request = {
+										        origin: startLocation,
+										        destination: destinationLocation,
+										        travelMode: google.maps.TravelMode.DRIVING
+										    };
+										  
+					    					
+   	
+											var polyline = new google.maps.Polyline({
+												path: [],
+											
+											});
+											bounds = new google.maps.LatLngBounds();
+														
+												
+											var legs = response.routes[index++].legs;
+												
+											for (i=0;i<legs.length;i++) {
+												var steps = legs[i].steps;
+												for (j=0;j<steps.length;j++) {
+													var nextSegment = steps[j].path;
+												    for (k=0;k<nextSegment.length;k++) {
+														  polyline.getPath().push(nextSegment[k]);
+														  bounds.extend(nextSegment[k]);
+													}
+												}
+											}
+											var count=0;
+											
+											events.forEach(function(element, index) {
+													
+													if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
+															console.log(element + " YES");
+															count++;
+					                                       	
+					                                       	
+					                                       
+													} else {
+															console.log(element + " not on edge");
+													}
+														   		
+											});
 
-
-                                                if (status === google.maps.DirectionsStatus.OK) {
-                                                    var polyline = new google.maps.Polyline({
-                                                        path: [],
-                                                        strokeColor: '#FF0000',
-                                                        strokeWeight: 3
-                                                    });
-                                                    var bounds = new google.maps.LatLngBounds();
-
-
-                                                    var legs = response.routes[index].legs;
-                                                    for (i = 0; i < legs.length; i++) {
-                                                        var steps = legs[i].steps;
-                                                        for (j = 0; j < steps.length; j++) {
-                                                            var nextSegment = steps[j].path;
-                                                            for (k = 0; k < nextSegment.length; k++) {
-                                                                polyline.getPath().push(nextSegment[k]);
-                                                                bounds.extend(nextSegment[k]);
-                                                            }
-                                                        }
-                                                    }
-
-                                                    events.forEach(function(element, index) {
-
-                                                        if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
-                                                            console.log(element + " YES");
-                                                        } else {
-                                                            console.log(element + " not on edge");
-                                                        }
-
-                                                    });
-
-                                                    directionsDisplay.setDirections(result);
-
-
-                                                }
-                                            });
-
-
-                                        });
-
-
+											var color;
+											var colorimage = document.createElement('img');
+											colorimage.style.height = "24px";
+											colorimage.style.width = "24px";
+											switch(index-1){
+												case 0: color = '#2ecc71'; 
+														colorimage.src = "images/green-colorpanel.png";
+														break;
+												case 1: color = '#2980b9';  
+														colorimage.src = "images/blue-colorpanel.png";
+														break;
+												case 2: color = '#9b59b6';  
+														colorimage.src = "images/purple-colorpanel.png";
+														break;
+											} 
+											var rendererOptions = {
+											    preserveViewport: true,
+											    polylineOptions:{
+											    	strokeColor: color,
+											    	strokeWeight: 7	
+											    }         
+											    
+											};
+											
+											var cRow = document.createElement('div');
+											
+					                        cRow.id = "row"+index;
+					                        cRow.className="span2";
+					                        cRow.style.margin = "17px";
+					                        document.getElementById('directions-panel').appendChild(cRow);
+					                        document.getElementById('row'+index).appendChild(colorimage);
+					                        document.getElementById('row'+index).innerHTML += " has "+count+" obstructions.";
+					                        
+					                       
+					                             	
+											directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+											directionsDisplay.setOptions({directions:response,routeIndex:index-1});
+							    			directionsDisplay.setMap(map);
+							    			
+							    			
+					    					       
+											
+											
+											
+										});
+										
+                                       /*edit panel to display count somewhere here*/     
+                                       
+                                       
+                                       
+							    	   directionsDisplay.setPanel(document.getElementById('directions-panel'));
+                                       map.fitBounds(bounds);
                                     } else
                                         alert("Routing failed!");
 
@@ -460,6 +483,11 @@
                     }
                 });
 
+            }
+            window.onload = function() {
+                document.getElementById('findItButton').onclick = function() {
+                    routeAddress();
+                };
             }
 
             google.maps.event.addDomListener(window, 'load', initialize);
@@ -473,11 +501,12 @@
 </head>
 
 
-<body>
+ <body onload = "routeAddress();popsidebar(document.getElementById('map-content'))">
 
         <div class = "navbar navbar-default navbar-fixed-top">
             <div class = "container">
-                <a href = "#" class = "navbar-brand"><img src = "routee.png" class ="headpic"></a>
+                <a href = "#" class = "navbar-brand"><img src = "routee.jpg" class ="headpic"></a>
+                
                 <button class = "navbar-toggle" data-toggle = "collapse" data-target = ".nav-collapse" type="button">
                 <span class="sr-only">Toggle navigation</span>
                     <span class = "icon-bar"></span>
@@ -485,38 +514,27 @@
                     <span class = "icon-bar"></span>
                 </button>
                 <div class = "collapse navbar-collapse nav-collapse">
-                    <ul class = "nav navbar-nav navbar-left">
-                        <li><a href = "#getDir" data-toggle="modal">Get Directions</a></li>
-                        <li><a href = "#getIns" data-toggle="modal">Instructions</a></li>
+                    <ul class = "nav navbar-nav navbar-right">
+                        <form class="navbar-form navbar-left" role="search">
+                            <div class="form-group">
+                                <input id="sourceTextBox" type="text" class="form-control" placeholder = "From where?" value='<?php echo $source; ?>'>
+                                <input id="destinationTextBox" type="text" class="form-control" placeholder = "To where?" value='<?php echo $destination; ?>'>
+                                <input id="findItButton" type="button" class="btn btn-default" value="Find It">
+                                <a id="helpbutton" href = "#getIns" data-toggle="modal"><img src = "images/help.png" class="headpic"></a>
+                                
+                            </div>
+                            <!--
+                            <button type="submit" onclick="routeAddress()" class="btn btn-default">Find it</button>
+                            -->
+
+                        </form>
                     </ul>
+                    
                 </div>
+                
             </div>
         </div>
 
-        <div class = "modal fade" id = "getDir" role = "dialog">
-            <div class = "modal-dialog">
-                <div class = "modal-content">
-                   
-                    <div class = "modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class = "modal-title" align = "center"> Get Directions </h4>
-                    </div>
-
-                    <div class = "modal-body">
-                        <p align = "center">Let Routee know where you're coming from and where you want to go. It will provide you options that will direct you to your destination.</p>
-                        <br>
-                        <input id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
-                        <br/>
-                        <input id = "destinationSearchText" type="text" class="form-control" placeholder="Where do you want to go?">
-                    </div>
-
-                    <div class = "modal-footer">
-                        <button type="button" class="btn btn-success btn-block"><i class="fa fa-arrows"> </i> Get Direction </button>
-                    </div>
-
-                </div>
-            </div>
-        </div>
 
         <div class = "modal fade" id = "getIns" role = "dialog">
             <div class = "modal-dialog">
@@ -595,37 +613,42 @@
         </div>
 
 		
-		<div class = "col-lg-4">
+		<div id="side-panel"  class = "col-lg-3">
 		
-        <div class = "well appear">
-                <h3> Reserved for directions module </h3>
-		</div>
-
-        <div class = "linkappear">
-
-        <ul class = "nav nav-tabs">
-            <li><a href = "#tab1" data-toggle="tab">Directions</a></li>
-            <li><a href = "#tab2" data-toggle="tab">Map View</a></li>
-        </ul>
-
-        <div class = "tab-content">     
-            <div class = "tab-pane active" id ="tab1">
-                <h3> Directions </h3>
-            </div>
-
-            <div class = "tab-pane" id ="tab2">
-                <div id="sm-map-canvas"></div>
-            </div>
+	        <div class = "well appear">
+	        		
+	                <div id="directions-panel"></div>
+			</div>
+	
+	        <div class = "linkappear">
+	
+		        <ul class = "nav nav-tabs">
+		            <li><a href = "#tab1" data-toggle="tab">Directions</a></li>
+		            <li><a href = "#tab2" data-toggle="tab">Map View</a></li>
+		        </ul>
+	
+		        <div class = "tab-content">     
+		            <div class = "tab-pane active" id ="tab1">
+		                <h3> Directions </h3>
+		            </div>
+		
+		            <div class = "tab-pane" id ="tab2">
+		                <div id="sm-map-canvas"></div>
+		            </div>
+		
+		        </div>
+			</div>
 
         </div>
-		</div>
 
-        </div>
-
-		<div class = "col-lg-8">
+		<div class = "col-lg-9">
 		
-        <div class = "appear">
-        <div id="map-canvas"></div>
+	        <div class = "appear">
+	       		
+		        <div id="map-canvas"></div>
+	            
+	        </div>
+
         </div>
 		
         </div>
