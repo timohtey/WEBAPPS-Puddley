@@ -17,6 +17,18 @@
                 $type = $_REQUEST['pType'];
                 $place = $_REQUEST['placeName'];
                 $Description = $_REQUEST['pDesc'];
+            } else {
+                $type = '';
+                $place = '';
+                $Description = '';
+            }
+
+            if (!empty($_REQUEST['sourceField']) && $_REQUEST['destinationField']) {
+                $source = $_REQUEST['sourceField'];
+                $destination = $_REQUEST['destinationField'];
+            } else {
+                $source = '';
+                $destination = '';
             }
         } catch (Exception $e) {
             
@@ -58,6 +70,8 @@
 
                 directionsDisplay.setMap(map);
                 directionsDisplay.setOptions({suppressMarkers: true});
+
+
 
 
                 var place = '<?php echo $place; ?>';
@@ -183,9 +197,11 @@
                 // -------------- AUTCOMPLETE ----------------------//
                 var sourceInput = document.getElementById('sourceTextBox');
                 var destinationInput = document.getElementById('destinationTextBox');
-
-                var autocomplete = new google.maps.places.Autocomplete(sourceInput);
-                var autocomplete2 = new google.maps.places.Autocomplete(destinationInput);
+                var options = {
+                    componentRestrictions: {country: "ph"}
+                };
+                var autocomplete = new google.maps.places.Autocomplete(sourceInput, options);
+                var autocomplete2 = new google.maps.places.Autocomplete(destinationInput, options);
 
                 autocomplete.bindTo('bounds', map);
                 autocomplete2.bindTo('bounds', map);
@@ -407,6 +423,8 @@
                     iconPath = "images/custom_markers/marker_accident.png";
                 else if (mType === "Construction")
                     iconPath = "images/custom_markers/marker_construction.png";
+                else if (mType === "Flood")
+                    iconPath = "images/custom_markers/marker_flood.png";
                 else if (mType === "Heavy Traffic")
                     iconPath = "images/custom_markers/marker_traffic.png";
                 else
@@ -451,7 +469,9 @@
                     });
                 }
             }
-
+            //VARIABLES FROM INDEX PHP INPUT
+            var source = '<?php echo $source; ?>';
+            var destination = '<?php echo $destination; ?>';
 
             function routeAddress() {
                 var source = document.getElementById("sourceTextBox").value;

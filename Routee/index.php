@@ -1,3 +1,5 @@
+
+<!DOCTYPE html>
 <html lang = "en">
 
     <head>
@@ -9,12 +11,14 @@
 
         <link href="css/cover.css" rel="stylesheet" type="text/css">
         <link href="css/fonts.css" type = "text/css" rel = "stylesheet">
+        <link href="css/jquery.qtip.css" type="text/css" rel="stylesheet" />
         <link href="font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
 
-        <script src="js/jquery-1.10.2.js">
-        </script>
+        <script src="js/jquery-1.10.2.js"></script>     
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>  
-        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false&libraries=places&region=ph"></script>
+        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false&libraries=places&region=ph"></script>                
+        <script type="text/javascript" src="js/jquery.qtip.js"></script>
+        <script type="text/javascript" src="js/jquery.imagesloaded.pkg.min.js"></script>
 
         <script type="text/javascript">
             $(document).ready(function() {
@@ -40,10 +44,12 @@
                 var sourceInput = document.getElementById('sourceSearchText');
                 var destinationInput = document.getElementById('destinationSearchText');
                 var eventInput = document.getElementById('eventSearchText');
-
-                var autocomplete = new google.maps.places.Autocomplete(sourceInput, {country: 'NL'});
-                var autocomplete2 = new google.maps.places.Autocomplete(destinationSearchText, {country: 'NL'});
-                var autocomplete3 = new google.maps.places.Autocomplete(eventSearchText, {country: 'NL'});
+                var options = {
+                    componentRestrictions: {country: "ph"}
+                };
+                var autocomplete = new google.maps.places.Autocomplete(sourceInput, options);
+                var autocomplete2 = new google.maps.places.Autocomplete(destinationSearchText, options);
+                var autocomplete3 = new google.maps.places.Autocomplete(eventSearchText, options);
 
                 autocomplete.bindTo('bounds', map);
                 autocomplete2.bindTo('bounds', map);
@@ -75,7 +81,127 @@
             }
             google.maps.event.addDomListener(window, 'load', initialize);
         </script>        
+        <script>
 
+            function ReportingErrorHandlers() {
+                document.getElementById("reportForm").onsubmit = function() {
+
+                    if (document.getElementById("eventSearchText").value === "" || document.getElementById("description").value === "") {
+
+                        if (document.getElementById("eventSearchText").value === "")
+                        {
+                            $('#eventSearchText').qtip({
+                                prerender: true,
+                                content: {
+                                    text: "We need to know the place"
+                                },
+                                position: {
+                                    my: 'bottom right',
+                                    at: 'top left',
+                                    target: $('#eventSearchText'),
+                                    viewport: $(window)
+                                },
+                                show: {
+                                    ready: true
+                                },
+                                hide: {
+                                    event: false,
+                                    inactive: 4000
+                                }
+
+                            });
+                        }
+                        if (document.getElementById("description").value === "")
+                        {
+                            $('#description').qtip({
+                                prerender: true,
+                                content: {
+                                    text: "Please do provide details"
+                                },
+                                position: {
+                                    my: 'bottom right',
+                                    at: 'top left',
+                                    target: $('#description'),
+                                    viewport: $(window)
+                                },
+                                show: {
+                                    ready: true
+                                },
+                                hide: {
+                                    event: false,
+                                    inactive: 4000
+                                }
+
+                            });
+                        }
+
+
+                        return false;
+                    }
+                };
+            }
+
+            function RoutingErrorHandlers() {
+                document.getElementById("routingForm").onsubmit = function() {
+                    if (document.getElementById("sourceSearchText").value === "" || document.getElementById("destinationSearchText").value === "") {
+                        if (document.getElementById("sourceSearchText").value === "")
+                        {
+                            $('#sourceSearchText').qtip({
+                                prerender: true,
+                                content: {
+                                    text: "We need to know where you came from"
+                                },
+                                position: {
+                                    my: 'bottom right',
+                                    at: 'top left',
+                                    target: $('#sourceSearchText'),
+                                    viewport: $(window)
+                                },
+                                show: {
+                                    ready: true
+                                },
+                                hide: {
+                                    event: false,
+                                    inactive: 4000
+                                }
+
+                            });
+                        }
+
+                        if (document.getElementById("destinationSearchText").value === "")
+                        {
+                            $('#destinationSearchText').qtip({
+                                prerender: true,
+                                content: {
+                                    text: "We need to know where you want to go"
+                                },
+                                position: {
+                                    my: 'bottom right',
+                                    at: 'top left',
+                                    target: $('#destinationSearchText'),
+                                    viewport: $(window)
+                                },
+                                show: {
+                                    ready: true
+                                },
+                                hide: {
+                                    event: false,
+                                    inactive: 4000
+                                }
+
+                            });
+                        }
+                         return false;
+                    }
+                };
+
+            }
+            window.onload = function() {
+                ReportingErrorHandlers();
+                RoutingErrorHandlers();
+            };
+
+        </script>
     </head>
 
 
@@ -101,15 +227,19 @@
                             <h2 align = "center"> Routing </h2>
                             <p align = "center"> Routee will assist you in finding the best routes possible.</p>
                             <br>
-                            <input id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
-                            <br/>
-                            <input id = "destinationSearchText" type="text" class="form-control" placeholder="Where do you want to go?">
-                            <br/>
-                            <div class="btn-group btn-group-justified">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-success"><i class="fa fa-arrows"> </i> Get Directions</button>
+                            <form method="POST" id="routingForm" action="routee.php">
+                                <input name="sourceField" id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
+                                <br/>
+                                <input name="destinationField" id = "destinationSearchText" type="text" class="form-control" placeholder="Where do you want to go?">
+                                <br/>
+                                <div class="btn-group btn-group-justified">
+                                    <div class="btn-group">
+                                        <button type="submit" name="submitRouting" class="btn btn-success"><i class="fa fa-arrows"> </i> Get Directions</button>
+                                    </div>
                                 </div>
-                            </div>
+
+                            </form>
+
                             <hr class = "gdivider">
                             <p align = "center">If there is a situation going on, please do not hesitate to tell us.</p>
                             <div class="btn-group btn-group-justified">
@@ -117,12 +247,13 @@
                                     <button type="button" class="btn btn-info" id = "btnReporting"><i class="fa fa-microphone"> </i> Reporting</button>
                                 </div>
                             </div>
-                        </div> <!--dissidia rerouting-->
+                        </div> <!--dissidia routing-->
 
                         <div class ="dissidia" style  = "display:none;" id = "reporting">
                             <h2 align = "center"> Reporting </h2>
                             <p align = "center">Let us know what is going on.</p><br>
-                            <form method="POST" action="routee.php">
+                            <!--Reporting form-->
+                            <form method="POST" id="reportForm" action="routee.php">
                                 <select name="pType" class="form-control">
                                     <option value="Accident">Accident</option>
                                     <option value="Flood">Flood</option>
@@ -133,20 +264,21 @@
                                 <br/>
                                 <input name="placeName" type="text" id = "eventSearchText" class="form-control" placeholder="Where is it happening?" >
                                 <br/>
-                                <textarea name="pDesc" style = "width:100%;" placeholder="What's going on?" class="form-control"></textarea>
+                                <textarea id="description" name="pDesc" style = "width:100%;" placeholder="What's going on?" class="form-control"></textarea>
                                 <br/>                            
                                 <div class="btn-group btn-group-justified">
                                     <div class="btn-group" >                                                       
-                                        <button type="submit" class="btn btn-success" id="contribute"> <i class="fa fa-microphone"></i> Report</button>
+                                        <button type="submit" name="submitReport" class="btn btn-success"> <i class="fa fa-microphone"></i> Report</button>
                                     </div>
                                 </div> <!-- justified buttons end -->
                                 <hr class = "gdivider">					
                                 <p align = "center"> If you want to find the fastest way to your destination, just ask us.</p>
                                 <div class="btn-group btn-group-justified">
                                     <div class="btn-group" >                                                       
-                                        <button type="button" class="btn btn-info" id="btnRerouting"> <i class="fa fa-arrows"></i> Rerouting</button>
+                                        <button type="button" class="btn btn-info" id="btnRerouting"> <i class="fa fa-arrows"></i> Routing</button>
                                     </div>
-                                </div> <!-- justified buttons end -->					
+                                </div> <!-- justified buttons end -->
+
                             </form> <!-- form post end -->		
                         </div> <!--dissidia reporting-->
 
