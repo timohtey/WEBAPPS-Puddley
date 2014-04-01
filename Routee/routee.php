@@ -43,15 +43,16 @@
             var startIsSet = false;
             var startLocation;
             var destinationLocation;
-            var waypts = [];
+            
 
             var currLetter = 65;
-            var markers = [];
+            var renderers = [];
 
             //Existing points
             var events = new Array();
             var directionsDisplay;
-            var directionsService = new google.maps.DirectionsService();
+            
+            
             function initialize() {
                 directionsDisplay = new google.maps.DirectionsRenderer();
                 geocoder = new google.maps.Geocoder();
@@ -348,6 +349,18 @@
             var destination = '<?php echo $destination; ?>';
             
             function routeAddress() {
+            	
+            	
+            	var directionsService = new google.maps.DirectionsService();
+            	
+            	//RESET PANEL
+            	document.getElementById('directions-panel').innerHTML = "";
+            	
+            	//REMOVE PREVIOUS POLYLINES
+            	for(var i = 0; i < renderers.length; i++){
+            		renderers[i].setMap(null);
+            	}
+            	
                 source = document.getElementById('sourceTextBox').value;
                 destination = document.getElementById('destinationTextBox').value;
                 
@@ -376,7 +389,7 @@
                                        	
 										response.routes.forEach(function(route){
 											
-											directionsService = new google.maps.DirectionsService();
+											
 											var request = {
 										        origin: startLocation,
 										        destination: destinationLocation,
@@ -384,9 +397,9 @@
 										    };
 										  
 					    					
-   	
+   											//polylines.push(response.routes[index].overview_path);
 											var polyline = new google.maps.Polyline({
-												path: [],
+												path: []
 											
 											});
 											bounds = new google.maps.LatLngBounds();
@@ -404,16 +417,15 @@
 													}
 												}
 											}
+											
+											
 											var count=0;
 											
 											events.forEach(function(element, index) {
 													
 													if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
 															console.log(element + " YES");
-															count++;
-					                                       	
-					                                       	
-					                                       
+															count++;  
 													} else {
 															console.log(element + " not on edge");
 													}
@@ -435,6 +447,7 @@
 														colorimage.src = "images/purple-colorpanel.png";
 														break;
 											} 
+											
 											var rendererOptions = {
 											    preserveViewport: true,
 											    polylineOptions:{
@@ -458,6 +471,7 @@
 											directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
 											directionsDisplay.setOptions({directions:response,routeIndex:index-1});
 							    			directionsDisplay.setMap(map);
+							    			renderers.push(directionsDisplay);
 							    			
 							    			
 					    					       
@@ -501,7 +515,7 @@
 </head>
 
 
- <body onload = "routeAddress();popsidebar(document.getElementById('map-content'))">
+ <body onload = "routeAddress();">
 
         <div class = "navbar navbar-default navbar-fixed-top">
             <div class = "container">
@@ -519,7 +533,7 @@
                             <div class="form-group">
                                 <input id="sourceTextBox" type="text" class="form-control" placeholder = "From where?" value='<?php echo $source; ?>'>
                                 <input id="destinationTextBox" type="text" class="form-control" placeholder = "To where?" value='<?php echo $destination; ?>'>
-                                <input id="findItButton" type="button" class="btn btn-default" value="Find It">
+                                <input id="findItButton" type="button" onclick="routeAddress();" class="btn btn-default" value="Find It">
                                 <a id="helpbutton" href = "#getIns" data-toggle="modal"><img src = "images/help.png" class="headpic"></a>
                                 
                             </div>
