@@ -2,7 +2,7 @@
 
 // database settings 
 $db_username = 'root';
-$db_password = 'berserkx';
+$db_password = '';
 $db_name = 'impassableareas';
 $db_host = 'localhost';
 
