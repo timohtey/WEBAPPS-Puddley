@@ -13,6 +13,7 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 body {
+  height:100%;
   font-family: "Raleway";
   margin: 0;
 }
@@ -29,6 +30,13 @@ nav,
 section,
 summary {
   display: block;
+}
+
+#directions-panel {
+	height:100%;
+	overflow:auto;
+ 
+  
 }
 audio,
 canvas,
@@ -6226,6 +6234,19 @@ html, body,#map-canvas, #sm-map-canvas {
   margin-right: auto;
   height: 250px;
   width: 400px;
+}
+
+#helpbutton{
+	margin-left: 80px;
+	
+}
+
+.appear{
+	height:100%;
+}
+
+#side-panel{
+	height:100%;
 }
 
 @media (max-width: 500px) {
