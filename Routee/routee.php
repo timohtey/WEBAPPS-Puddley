@@ -448,6 +448,7 @@
 														break;
 											} 
 											
+											
 											var rendererOptions = {
 											    preserveViewport: true,
 											    polylineOptions:{
@@ -461,13 +462,12 @@
 											
 					                        cRow.id = "row"+index;
 					                        cRow.className="span2";
-					                        cRow.style.margin = "17px";
+					                        cRow.style.margin = "18px";
 					                        document.getElementById('directions-panel').appendChild(cRow);
 					                        document.getElementById('row'+index).appendChild(colorimage);
 					                        document.getElementById('row'+index).innerHTML += " has "+count+" obstructions.";
 					                        
-					                       
-					                             	
+
 											directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
 											directionsDisplay.setOptions({directions:response,routeIndex:index-1});
 							    			directionsDisplay.setMap(map);
