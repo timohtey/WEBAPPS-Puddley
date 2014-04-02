@@ -1,18 +1,19 @@
 <html lang = "en">
 
-<head>
+    <head>
 
-    <meta charset="utf-8">
-    <title>Routee</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link href="css/coco.css" rel="stylesheet">
-    <link href="css/fonts.css" type = "text/css" rel = "stylesheet">
-    <link href="font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
-    
-    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false&libraries=places"></script>        
-        
+        <meta charset="utf-8">
+        <title>Routee</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="">
+        <meta name="author" content="">
+        <link href="css/coco.css" rel="stylesheet">
+        <link href="css/fonts.css" type = "text/css" rel = "stylesheet">
+        <link href="font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+        <link rel= "shortcut icon" href="images/routee.png">
+
+        <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false&libraries=places"></script>        
+
         <?php
         try {
             if (!empty($_REQUEST['pType']) && !empty($_REQUEST['placeName']) && !empty($_REQUEST['pDesc'])) {
@@ -29,21 +30,21 @@
                 $source = $_REQUEST['sourceField'];
                 $destination = $_REQUEST['destinationField'];
             } else {
-                 $source = '';
+                $source = '';
                 $destination = '';
             }
         } catch (Exception $e) {
             
         }
         ?>
-      <script>
+        <script>
             var map;
             var centerOfMap = new google.maps.LatLng(14.56486, 120.99370);
             var geocoder;
             var startIsSet = false;
             var startLocation;
             var destinationLocation;
-            
+
 
             var currLetter = 65;
             var renderers = [];
@@ -51,8 +52,8 @@
             //Existing points
             var events = new Array();
             var directionsDisplay;
-            
-            
+
+
             function initialize() {
                 directionsDisplay = new google.maps.DirectionsRenderer();
                 geocoder = new google.maps.Geocoder();
@@ -214,7 +215,85 @@
                 google.maps.event.addDomListener(window, 'load', initialize);
             }
 
+            /*----------------- AUTO DELETION SCRIPTS  ------------------*/
+            /*----------------- RUNS EVERY MIDNIGHT FOR TYPES [CONSTRUCTION, FLOOD AND OTHERS]  ------------------*/
+            var now = new Date();
+            var timeForRefresh = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0) - now;
 
+            if (timeForRefresh < 0)
+            {
+                timeForRefresh += 86400000;
+            }
+            var six_hours = 21600000;
+
+            /*Time function per 24 hours at 00:00*/
+            setTimeout(function() {
+
+                for (var i = 0; i < eventDates.length; i++)
+                {
+                    refreshDel(eventDates[i], i);
+                }
+
+            }, timeForRefresh);
+            /*Interval function per 6 hours*/
+            setInterval(function() {
+
+                for (var i = 0; i < eventDates.length; i++)
+                {
+                    refreshDel(eventDates[i], i);
+                }
+
+
+            }, six_hours);
+
+            /*----------------- DELETION SUPPORT FUNCTION ------------------*/
+            function refreshDel(date_event, index)
+            {
+                var oneDay = 24 * 60 * 60 * 1000;
+                date_event = date_event.split(" ");
+                var parts_date = date_event[0].split("-");
+                var parts_time = date_event[1].split(":");
+                var query_date = new Date(parts_date[0], parts_date[1] - 1, parts_date[2], parts_time[0], parts_time[1], parts_time[2]);
+                var diffDays = Math.round(Math.abs((now.getTime() - query_date.getTime()) / (oneDay)));
+
+                var oneHour = 3600000;
+                var diffHours = Math.round(Math.abs((now.getTime() - query_date.getTime()) / (oneHour)));
+
+
+                type = date_event[2];
+
+                if (diffDays >= 1 && (type === "Flood" || type === "Construction" || type === "Others"))
+                {
+                    var pos = events[index];
+                    var marker = new google.maps.Marker({
+                        position: pos,
+                        draggable: false
+                    });
+                    remove_marker(marker);
+                    events.pop(events[index]);
+                    eventDates.pop(date_event);
+                } else if (diffDays < 1 && diffHours >= 2 && type === "Heavy Traffic")
+                {
+                    var pos = events[index];
+                    var marker = new google.maps.Marker({
+                        position: pos,
+                        draggable: false
+                    });
+                    remove_marker(marker);
+                    events.pop(events[index]);
+                    eventDates.pop(date_event);
+                } else if (diffDays < 1 && diffHours >= 4 && type === "Accident")
+                {
+                    var pos = events[index];
+                    var marker = new google.maps.Marker({
+                        position: pos,
+                        draggable: false
+                    });
+                    remove_marker(marker);
+                    events.pop(events[index]);
+                    eventDates.pop(date_event);
+                }
+            }
 
             //------------------ADD MARKER FUNCTION---------------------------
             function add_marker(MapPos, MapTitle, MapDesc, InfoOpenDefault, DragAble, Removable, iconPath)
@@ -276,7 +355,7 @@
                 });
             }
 
-            
+
             //------------------SAVE MARKER TO DB FUNCTION---------------------------
             function save_marker(Marker, mDesc, mType, replaceWin, mAddress)
             {
@@ -344,35 +423,35 @@
                 }
             }
 
-			//VARIABLES FROM INDEX PHP INPUT
+            //VARIABLES FROM INDEX PHP INPUT
             var source = '<?php echo $source; ?>';
             var destination = '<?php echo $destination; ?>';
-            
+
             function routeAddress() {
-            	
-            	
-            	var directionsService = new google.maps.DirectionsService();
-            	
-            	//RESET PANEL
-            	document.getElementById('directions-panel').innerHTML = "";
-            	
-            	//REMOVE PREVIOUS POLYLINES
-            	for(var i = 0; i < renderers.length; i++){
-            		renderers[i].setMap(null);
-            	}
-            	
+
+
+                var directionsService = new google.maps.DirectionsService();
+
+                //RESET PANEL
+                document.getElementById('directions-panel').innerHTML = "";
+
+                //REMOVE PREVIOUS POLYLINES
+                for (var i = 0; i < renderers.length; i++) {
+                    renderers[i].setMap(null);
+                }
+
                 source = document.getElementById('sourceTextBox').value;
                 destination = document.getElementById('destinationTextBox').value;
-                
+
                 geocoder.geocode({'address': source}, function(results, status) {
                     if (status == google.maps.GeocoderStatus.OK) {
                         startLocation = results[0].geometry.location;
-                       
+
 
                         geocoder.geocode({'address': destination}, function(results, status) {
                             if (status == google.maps.GeocoderStatus.OK) {
                                 destinationLocation = results[0].geometry.location;
-                                
+
                                 var request = {
                                     origin: startLocation,
                                     destination: destinationLocation,
@@ -382,110 +461,113 @@
 
                                 directionsService.route(request, function(response, status) {
                                     if (status == google.maps.DirectionsStatus.OK) {
-                                    	//alert(response.routes.length);
-                                       	var index = 0;
-                                       	var colorindex=0;
-                                       	var bounds;
-                                       	
-										response.routes.forEach(function(route){
-											
-											
-											var request = {
-										        origin: startLocation,
-										        destination: destinationLocation,
-										        travelMode: google.maps.TravelMode.DRIVING
-										    };
-										  
-					    					
-   											//polylines.push(response.routes[index].overview_path);
-											var polyline = new google.maps.Polyline({
-												path: []
-											
-											});
-											bounds = new google.maps.LatLngBounds();
-														
-												
-											var legs = response.routes[index++].legs;
-												
-											for (i=0;i<legs.length;i++) {
-												var steps = legs[i].steps;
-												for (j=0;j<steps.length;j++) {
-													var nextSegment = steps[j].path;
-												    for (k=0;k<nextSegment.length;k++) {
-														  polyline.getPath().push(nextSegment[k]);
-														  bounds.extend(nextSegment[k]);
-													}
-												}
-											}
-											
-											
-											var count=0;
-											
-											events.forEach(function(element, index) {
-													
-													if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
-															console.log(element + " YES");
-															count++;  
-													} else {
-															console.log(element + " not on edge");
-													}
-														   		
-											});
+                                        //alert(response.routes.length);
+                                        var index = 0;
+                                        var colorindex = 0;
+                                        var bounds;
 
-											var color;
-											var colorimage = document.createElement('img');
-											colorimage.style.height = "24px";
-											colorimage.style.width = "24px";
-											switch(index-1){
-												case 0: color = '#2ecc71'; 
-														colorimage.src = "images/green-colorpanel.png";
-														break;
-												case 1: color = '#2980b9';  
-														colorimage.src = "images/blue-colorpanel.png";
-														break;
-												case 2: color = '#9b59b6';  
-														colorimage.src = "images/purple-colorpanel.png";
-														break;
-											} 
-											
-											
-											var rendererOptions = {
-											    preserveViewport: true,
-											    polylineOptions:{
-											    	strokeColor: color,
-											    	strokeWeight: 7	
-											    }         
-											    
-											};
-											
-											var cRow = document.createElement('div');
-											
-					                        cRow.id = "row"+index;
-					                        cRow.className="span2";
-					                        cRow.style.margin = "18px";
-					                        document.getElementById('directions-panel').appendChild(cRow);
-					                        document.getElementById('row'+index).appendChild(colorimage);
-					                        document.getElementById('row'+index).innerHTML += " has "+count+" obstructions.";
-					                        
+                                        response.routes.forEach(function(route) {
 
-											directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
-											directionsDisplay.setOptions({directions:response,routeIndex:index-1});
-							    			directionsDisplay.setMap(map);
-							    			renderers.push(directionsDisplay);
-							    			
-							    			
-					    					       
-											
-											
-											
-										});
-										
-                                       /*edit panel to display count somewhere here*/     
-                                       
-                                       
-                                       
-							    	   directionsDisplay.setPanel(document.getElementById('directions-panel'));
-                                       map.fitBounds(bounds);
+
+                                            var request = {
+                                                origin: startLocation,
+                                                destination: destinationLocation,
+                                                travelMode: google.maps.TravelMode.DRIVING
+                                            };
+
+
+                                            //polylines.push(response.routes[index].overview_path);
+                                            var polyline = new google.maps.Polyline({
+                                                path: []
+
+                                            });
+                                            bounds = new google.maps.LatLngBounds();
+
+
+                                            var legs = response.routes[index++].legs;
+
+                                            for (i = 0; i < legs.length; i++) {
+                                                var steps = legs[i].steps;
+                                                for (j = 0; j < steps.length; j++) {
+                                                    var nextSegment = steps[j].path;
+                                                    for (k = 0; k < nextSegment.length; k++) {
+                                                        polyline.getPath().push(nextSegment[k]);
+                                                        bounds.extend(nextSegment[k]);
+                                                    }
+                                                }
+                                            }
+
+
+                                            var count = 0;
+
+                                            events.forEach(function(element, index) {
+
+                                                if (google.maps.geometry.poly.isLocationOnEdge(element, polyline, .0001)) {
+                                                    console.log(element + " YES");
+                                                    count++;
+                                                } else {
+                                                    console.log(element + " not on edge");
+                                                }
+
+                                            });
+
+                                            var color;
+                                            var colorimage = document.createElement('img');
+                                            colorimage.style.height = "24px";
+                                            colorimage.style.width = "24px";
+                                            switch (index - 1) {
+                                                case 0:
+                                                    color = '#2ecc71';
+                                                    colorimage.src = "images/green-colorpanel.png";
+                                                    break;
+                                                case 1:
+                                                    color = '#2980b9';
+                                                    colorimage.src = "images/blue-colorpanel.png";
+                                                    break;
+                                                case 2:
+                                                    color = '#9b59b6';
+                                                    colorimage.src = "images/purple-colorpanel.png";
+                                                    break;
+                                            }
+
+
+                                            var rendererOptions = {
+                                                preserveViewport: true,
+                                                polylineOptions: {
+                                                    strokeColor: color,
+                                                    strokeWeight: 7
+                                                }
+
+                                            };
+
+                                            var cRow = document.createElement('div');
+
+                                            cRow.id = "row" + index;
+                                            cRow.className = "span2";
+                                            cRow.style.margin = "18px";
+                                            document.getElementById('directions-panel').appendChild(cRow);
+                                            document.getElementById('row' + index).appendChild(colorimage);
+                                            document.getElementById('row' + index).innerHTML += " has " + count + " obstructions.";
+
+
+                                            directionsDisplay = new google.maps.DirectionsRenderer(rendererOptions);
+                                            directionsDisplay.setOptions({directions: response, routeIndex: index - 1});
+                                            directionsDisplay.setMap(map);
+                                            renderers.push(directionsDisplay);
+
+
+
+
+
+
+                                        });
+
+                                        /*edit panel to display count somewhere here*/
+
+
+
+                                        directionsDisplay.setPanel(document.getElementById('directions-panel'));
+                                        map.fitBounds(bounds);
                                     } else
                                         alert("Routing failed!");
 
@@ -512,17 +594,17 @@
             });
         </script>     
 
-</head>
+    </head>
 
 
- <body onload = "routeAddress();">
+    <body onload = "routeAddress();">
 
         <div class = "navbar navbar-default navbar-fixed-top">
             <div class = "container">
-                <a href = "#" class = "navbar-brand"><img src = "routee.jpg" class ="headpic"></a>
-                
+                <a href = "index.php" class = "navbar-brand"><img src = "images/routee.png" class ="headpic"></a>
+
                 <button class = "navbar-toggle" data-toggle = "collapse" data-target = ".nav-collapse" type="button">
-                <span class="sr-only">Toggle navigation</span>
+                    <span class="sr-only">Toggle navigation</span>
                     <span class = "icon-bar"></span>
                     <span class = "icon-bar"></span>
                     <span class = "icon-bar"></span>
@@ -535,7 +617,7 @@
                                 <input id="destinationTextBox" type="text" class="form-control" placeholder = "To where?" value='<?php echo $destination; ?>'>
                                 <input id="findItButton" type="button" onclick="routeAddress();" class="btn btn-default" value="Find It">
                                 <a id="helpbutton" href = "#getIns" data-toggle="modal"><img src = "images/help.png" class="headpic"></a>
-                                
+
                             </div>
                             <!--
                             <button type="submit" onclick="routeAddress()" class="btn btn-default">Find it</button>
@@ -543,9 +625,9 @@
 
                         </form>
                     </ul>
-                    
+
                 </div>
-                
+
             </div>
         </div>
 
@@ -553,7 +635,7 @@
         <div class = "modal fade" id = "getIns" role = "dialog">
             <div class = "modal-dialog">
                 <div class = "modal-content">
-                   
+
                     <div class = "modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                         <h4 class = "modal-title" align = "center"> Hello there!</h4>
@@ -565,11 +647,11 @@
 
                         <img src = "images/ins1.jpg" class="img-responsive">
                         <br><br> 
-                       
+
                         <p align = "center"> Another neat feature is the '<em>Reporting</em>' aspect of Routee? How do we do this? Just right-click on the location in the map and select the situation. Simple!<br><br>
                         </p>
 
-                         <img src = "images/ins2.jpg" class="img-responsive">
+                        <img src = "images/ins2.jpg" class="img-responsive">
 
                         <br><br>
 
@@ -577,10 +659,10 @@
                         <br>
 
                         <div class="media">
-                            
+
                             <a class="pull-left">
                                 <img class="media-object" src="images/custom_markers/accident_SD.png">
-                             </a>
+                            </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Accident</h4>
                                 <p>If a road accident had occured, this marker will represent that on the map. This type of event takes a while to resolve.</p>
@@ -588,7 +670,7 @@
 
                             <a class="pull-left">
                                 <img class="media-object" src="images/custom_markers/construction_SD.png">
-                             </a>
+                            </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Construction</h4>
                                 <p>When there is a construction project on-going, it will be represented by this marker. This event takes a very long time to resolve and should be avoided as much as possible.</p>
@@ -596,7 +678,7 @@
 
                             <a class="pull-left">
                                 <img class="media-object" src="images/custom_markers/flood_SD.png">
-                             </a>
+                            </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Flood</h4>
                                 <p>On days when there is heavy rain present, floods are likely to occur. Areas that are affected will be presented with this. Some areas are passable depending on the terrain.</p>
@@ -604,7 +686,7 @@
 
                             <a class="pull-left">
                                 <img class="media-object" src="images/custom_markers/traffic_SD.png">
-                             </a>
+                            </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Traffic</h4>
                                 <p>This is a common problem in the Philippines and is considered more of a nuisance. Areas with heavy traffic are represented by this marker.</p>
@@ -612,7 +694,7 @@
 
                             <a class="pull-left">
                                 <img class="media-object" src="images/custom_markers/other_SD.png">
-                             </a>
+                            </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Others</h4>
                                 <p>If a situation arises and it is not listed within the choices, you can present it using this marker.</p>
@@ -626,50 +708,50 @@
             </div>
         </div>
 
-		
-		<div id="side-panel"  class = "col-lg-3">
-		
-	        <div class = "well appear">
-	        		
-	                <div id="directions-panel"></div>
-			</div>
-	
-	        <div class = "linkappear">
-	
-		        <ul class = "nav nav-tabs">
-		            <li><a href = "#tab1" data-toggle="tab">Directions</a></li>
-		            <li><a href = "#tab2" data-toggle="tab">Map View</a></li>
-		        </ul>
-	
-		        <div class = "tab-content">     
-		            <div class = "tab-pane active" id ="tab1">
-		                <h3> Directions </h3>
-		            </div>
-		
-		            <div class = "tab-pane" id ="tab2">
-		                <div id="sm-map-canvas"></div>
-		            </div>
-		
-		        </div>
-			</div>
+
+        <div id="side-panel"  class = "col-lg-3">
+
+            <div class = "well appear">
+
+                <div id="directions-panel"></div>
+            </div>
+
+            <div class = "linkappear">
+
+                <ul class = "nav nav-tabs">
+                    <li><a href = "#tab1" data-toggle="tab">Directions</a></li>
+                    <li><a href = "#tab2" data-toggle="tab">Map View</a></li>
+                </ul>
+
+                <div class = "tab-content">     
+                    <div class = "tab-pane active" id ="tab1">
+                        <h3> Directions </h3>
+                    </div>
+
+                    <div class = "tab-pane" id ="tab2">
+                        <div id="sm-map-canvas"></div>
+                    </div>
+
+                </div>
+            </div>
 
         </div>
 
-		<div class = "col-lg-9">
-		
-	        <div class = "appear">
-	       		
-		        <div id="map-canvas"></div>
-	            
-	        </div>
+        <div class = "col-lg-9">
+
+            <div class = "appear">
+
+                <div id="map-canvas"></div>
+
+            </div>
 
         </div>
-		
-        </div>
+
+    </div>
 
 
 
-	<script src="js/jquery-1.10.2.js"></script>
+    <script src="js/jquery-1.10.2.js"></script>
     <script src = "js/bootstrap.js"></script>
 
 
