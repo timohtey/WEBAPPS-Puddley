@@ -55,13 +55,15 @@
 
 
             function initialize() {
+                var paleDawn = [{"featureType": "water", "stylers": [{"visibility": "on"}, {"color": "#acbcc9"}]}, {"featureType": "landscape", "stylers": [{"color": "#f2e5d4"}]}, {"featureType": "road.highway", "elementType": "geometry", "stylers": [{"color": "#c5c6c6"}]}, {"featureType": "road.arterial", "elementType": "geometry", "stylers": [{"color": "#e4d7c6"}]}, {"featureType": "road.local", "elementType": "geometry", "stylers": [{"color": "#fbfaf7"}]}, {"featureType": "poi.park", "elementType": "geometry", "stylers": [{"color": "#c5dac6"}]}, {"featureType": "administrative", "stylers": [{"visibility": "on"}, {"lightness": 33}]}, {"featureType": "road"}, {"featureType": "poi.park", "elementType": "labels", "stylers": [{"visibility": "on"}, {"lightness": 20}]}, {}, {"featureType": "road", "stylers": [{"lightness": 20}]}];
                 directionsDisplay = new google.maps.DirectionsRenderer();
                 geocoder = new google.maps.Geocoder();
                 var mapInitialize = {
                     center: centerOfMap,
                     zoom: 15,
                     disableDoubleClickZoom: true,
-                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,
+                    styles: paleDawn
 
                 };
                 map = new google.maps.Map(document.getElementById('map-canvas'), mapInitialize);
@@ -461,9 +463,7 @@
 
                                 directionsService.route(request, function(response, status) {
                                     if (status == google.maps.DirectionsStatus.OK) {
-                                        //alert(response.routes.length);
                                         var index = 0;
-                                        var colorindex = 0;
                                         var bounds;
 
                                         response.routes.forEach(function(route) {
@@ -561,11 +561,6 @@
 
 
                                         });
-
-                                        /*edit panel to display count somewhere here*/
-
-
-
                                         directionsDisplay.setPanel(document.getElementById('directions-panel'));
                                         map.fitBounds(bounds);
                                     } else
@@ -602,32 +597,15 @@
         <div class = "navbar navbar-default navbar-fixed-top">
             <div class = "container">
                 <a href = "index.php" class = "navbar-brand"><img src = "images/routee.png" class ="headpic"></a>
+                <form class="navbar-form navbar-left appear" role="search">
+                    <div class="form-group">
+                        <input id="sourceTextBox" type="text" class="form-control" placeholder = "From where?" value='<?php echo $source; ?>'>
+                        <input id="destinationTextBox" type="text" class="form-control" placeholder = "To where?" value='<?php echo $destination; ?>'>
+                        <input id="findItButton" type="button" onclick="routeAddress();" class="btn btn-default" value="Find It">
+                        <a id="helpbutton" href = "#getIns" data-toggle="modal"><img src = "images/help.png" class="headpic"></a>
 
-                <button class = "navbar-toggle" data-toggle = "collapse" data-target = ".nav-collapse" type="button">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class = "icon-bar"></span>
-                    <span class = "icon-bar"></span>
-                    <span class = "icon-bar"></span>
-                </button>
-                <div class = "collapse navbar-collapse nav-collapse">
-                    <ul class = "nav navbar-nav navbar-right">
-                        <form class="navbar-form navbar-left" role="search">
-                            <div class="form-group">
-                                <input id="sourceTextBox" type="text" class="form-control" placeholder = "From where?" value='<?php echo $source; ?>'>
-                                <input id="destinationTextBox" type="text" class="form-control" placeholder = "To where?" value='<?php echo $destination; ?>'>
-                                <input id="findItButton" type="button" onclick="routeAddress();" class="btn btn-default" value="Find It">
-                                <a id="helpbutton" href = "#getIns" data-toggle="modal"><img src = "images/help.png" class="headpic"></a>
-
-                            </div>
-                            <!--
-                            <button type="submit" onclick="routeAddress()" class="btn btn-default">Find it</button>
-                            -->
-
-                        </form>
-                    </ul>
-
-                </div>
-
+                    </div>                 
+                </form>   
             </div>
         </div>
 
@@ -709,53 +687,73 @@
         </div>
 
 
-        <div id="side-panel"  class = "col-lg-3">
-
-            <div class = "well appear">
-
+        <div class = "col-lg-3 appear">
+            <div class = "well">
                 <div id="directions-panel"></div>
             </div>
+        </div>
 
-            <div class = "linkappear">
-
-                <ul class = "nav nav-tabs">
-                    <li><a href = "#tab1" data-toggle="tab">Directions</a></li>
-                    <li><a href = "#tab2" data-toggle="tab">Map View</a></li>
-                </ul>
-
-                <div class = "tab-content">     
-                    <div class = "tab-pane active" id ="tab1">
-                        <h3> Directions </h3>
+        <div class = "hideslide">
+            <div id="slideout">
+                <img src="images/info.png" alt="Information" />
+            </div>
+            <div id="slideout_inner">
+                <div class = "infoslide">
+                    <div class="btn-group btn-group-justified">
+                        <div class="btn-group">
+                            <button name="submitPath" class="btn btn-info" data-toggle="modal" data-target="#getIns"><i class="fa fa-arrows"> </i>Instructions</button>
+                        </div>
                     </div>
-
-                    <div class = "tab-pane" id ="tab2">
-                        <div id="sm-map-canvas"></div>
-                    </div>
-
+                    <hr class = "gdivider">
+                    <form method="POST">
+                        <input name="sourceField" id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
+                        <br/>
+                        <input name="destinationField" id = "destinationSearchText" type="text" class="form-control" placeholder="Where do you want to go?">
+                        <br/>
+                        <div class="btn-group btn-group-justified">
+                            <div class="btn-group">
+                                <button type="submit" name="submitPath" class="btn btn-success"><i class="fa fa-arrows"> </i> Get Directions</button>
+                            </div>
+                        </div>
+                    </form>
+                    <hr class = "gdivider">
+                    <h3> Directions </h3>
                 </div>
-            </div>
+            </div> 
+        </div>   
 
+        <div class = "col-lg-9 linkappear">             
+            <div id="map-canvas"></div>
         </div>
 
-        <div class = "col-lg-9">
-
-            <div class = "appear">
-
-                <div id="map-canvas"></div>
-
-            </div>
-
-        </div>
-
-    </div>
 
 
 
-    <script src="js/jquery-1.10.2.js"></script>
-    <script src = "js/bootstrap.js"></script>
+        <script src="js/jquery-1.10.2.js"></script>
+        <script src = "js/bootstrap.js"></script>
 
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#slideout').click(function() {
+                    var left = $('#slideout').css('left');
+                    if (left == '0px')
+                    {
+                        $('#slideout_inner').animate({left: '0px'});
+                        $('#slideout').animate({left: '400px'});
+                        left = $('#slideout').css('left');
+                    }
+                    if (left == '400px')
+                    {
+                        $('#slideout_inner').animate({left: '-400px'});
+                        $('#slideout').animate({left: '0px'});
+                        left = $('#slideout').css('left');
+                    }
+                });
+            });
+        </script>
 
-</body>
+    </body>
+
 
 
 </html>
