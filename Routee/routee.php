@@ -9,14 +9,11 @@
         <meta name="author" content="">
         <link href="css/coco.css" rel="stylesheet">
         <link href="css/fonts.css" type = "text/css" rel = "stylesheet">
-        <link href="css/jquery.qtip.css" type="text/css" rel="stylesheet" />
         <link href="font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
         <link rel= "shortcut icon" href="images/routee.png">
 
-        <script src="js/jquery-1.10.2.js"></script>   
         <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDQFSdn0OTS5bgEVYvfGMBWmkC54uk-6PM&sensor=false&libraries=places"></script>        
-        <script type="text/javascript" src="js/jquery.qtip.js"></script>
-        <script type="text/javascript" src="js/jquery.imagesloaded.pkg.min.js"></script>
+
         <?php
         try {
             if (!empty($_REQUEST['pType']) && !empty($_REQUEST['placeName']) && !empty($_REQUEST['pDesc'])) {
@@ -148,30 +145,32 @@
                 //Get the existing points
                 $.get("dbControl.php", function(data) {
                     $(data).find("marker").each(function() {
+                        var deleted = $(this).attr('deleted');                        
+                        if (deleted != 'yes') {
+                            var type = $(this).attr('type');
+                            var date = $(this).attr('date');
+                            date = date.split(" ");
+                            var desc = '<h6> Date:  ' + date[0] + '  Time:  ' + date[1] + ' </h6>' + $(this).attr('Address') + '</p><hr>' + '<p>' + $(this).attr('description') + '</p>';
+                            var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));
+                            var iconPath;
 
-                        var type = $(this).attr('type');
-                        var date = $(this).attr('date');
-                        date = date.split(" ");
-                        var desc = '<h6> Date:  ' + date[0] + '  Time:  ' + date[1] + ' </h6>' + $(this).attr('Address') + '</p><hr>' + '<p>' + $(this).attr('description') + '</p>';
-                        var point = new google.maps.LatLng(parseFloat($(this).attr('lat')), parseFloat($(this).attr('lng')));
-                        var iconPath;
-
-                        if (type === "Accident")
-                            iconPath = "images/custom_markers/marker_accident.png";
-                        else if (type === "Construction")
-                            iconPath = "images/custom_markers/marker_construction.png";
-                        else if (type === "Heavy Traffic")
-                            iconPath = "images/custom_markers/marker_traffic.png";
-                        else if (type === "Flood")
-                            iconPath = "images/custom_markers/marker_flood.png";
-                        else
-                            iconPath = "images/custom_markers/marker_others.png";
-                        events.push(point);
-                        add_marker(point, type, desc, true, false, false, iconPath);
+                            if (type === "Accident")
+                                iconPath = "images/custom_markers/marker_accident.png";
+                            else if (type === "Construction")
+                                iconPath = "images/custom_markers/marker_construction.png";
+                            else if (type === "Heavy Traffic")
+                                iconPath = "images/custom_markers/marker_traffic.png";
+                            else if (type === "Flood")
+                                iconPath = "images/custom_markers/marker_flood.png";
+                            else
+                                iconPath = "images/custom_markers/marker_others.png";
+                            events.push(point);
+                            add_marker(point, type, desc, true, false, false, iconPath);
+                        }
                     });
                 });
                 //Right Click to Drop a New Marker
-                google.maps.event.addListener(map, 'click', function(event) {
+                google.maps.event.addListener(map, 'rightclick', function(event) {
 
                     geocoder.geocode({'latLng': event.latLng}, function(results, status) {
                         if (status === google.maps.GeocoderStatus.OK) {
@@ -194,32 +193,17 @@
                     });
                 });
 
-                // -------------- AUTOCOMPLETE ----------------------//
+                // -------------- AUTCOMPLETE ----------------------//
                 var sourceInput = document.getElementById('sourceTextBox');
                 var destinationInput = document.getElementById('destinationTextBox');
-                var pop_source = document.getElementById('sourceTextBox_pop');
-                var pop_destination = document.getElementById('destinationTextBox_pop');
 
-
-                var options = {
-                    componentRestrictions: {country: "ph"}
-                };
-                var autocomplete = new google.maps.places.Autocomplete(sourceInput, options);
-                var autocomplete2 = new google.maps.places.Autocomplete(destinationInput, options);
-                var autocomplete3 = new google.maps.places.Autocomplete(pop_source, options);
-                var autocomplete4 = new google.maps.places.Autocomplete(pop_destination, options);
-
+                var autocomplete = new google.maps.places.Autocomplete(sourceInput);
+                var autocomplete2 = new google.maps.places.Autocomplete(destinationInput);
 
                 autocomplete.bindTo('bounds', map);
                 autocomplete2.bindTo('bounds', map);
-                autocomplete3.bindTo('bounds', map);
-                autocomplete4.bindTo('bounds', map);
-
                 autocomplete.setComponentRestrictions({country: 'ph'});
                 autocomplete2.setComponentRestrictions({country: 'ph'});
-                autocomplete3.setComponentRestrictions({country: 'ph'});
-                autocomplete4.setComponentRestrictions({country: 'ph'});
-
 
                 var infowindow = new google.maps.InfoWindow();
 
@@ -229,15 +213,6 @@
                 });
 
                 google.maps.event.addListener(autocomplete2, 'place_changed', function() {
-                    infowindow.close();
-                    var place = autocomplete2.getPlace();
-                });
-                google.maps.event.addListener(autocomplete3, 'place_changed', function() {
-                    infowindow.close();
-                    var place = autocomplete.getPlace();
-                });
-
-                google.maps.event.addListener(autocomplete4, 'place_changed', function() {
                     infowindow.close();
                     var place = autocomplete2.getPlace();
                 });
@@ -338,15 +313,14 @@
                     title: "Map Report",
                     icon: iconPath
                 });
+
+                //Content structure of info Window for the Markers
                 var contentString = $('<div class="marker-info-win">' +
                         '<div class="marker-inner-win"><span class="info-content">' +
                         '<h3 class="marker-heading">' + MapTitle + '</h3>' +
                         MapDesc +
-                        '</span><button name="remove-marker" class="remove-marker" title="Remove Report">Remove Report</button>' +
+                        '</span><button name="remove-marker" class="remove-marker" title="Remove Marker">Remove Marker</button>' +
                         '</div></div>');
-
-                //Content structure of info Window for the Markers
-
 
 
                 var markerinfowindow = new google.maps.InfoWindow();
@@ -403,7 +377,7 @@
                 console.log(mLatLang);
                 console.log(date);
 
-                var myData = {description: mDesc, latlang: mLatLang, type: mType, address: mAddress, date: date};
+                var myData = {description: mDesc, latlang: mLatLang, type: mType, address: mAddress, date: date, deleted: 'no'};
                 var iconPath;
                 if (mType === "Accident")
                     iconPath = "images/custom_markers/marker_accident.png";
@@ -473,22 +447,9 @@
                 for (var i = 0; i < renderers.length; i++) {
                     renderers[i].setMap(null);
                 }
-                var source;
-                var destination;
 
-                if (document.getElementById('sourceTextBox').value != "" && document.getElementById('destinationTextBox').value != "")
-                {
-                    source = document.getElementById('sourceTextBox').value;
-                    destination = document.getElementById('destinationTextBox').value;
-                } else if (document.getElementById('sourceTextBox_pop').value != "" && document.getElementById('destinationTextBox_pop').value != "")
-                {
-                    source = document.getElementById('sourceTextBox_pop').value;
-                    destination = document.getElementById('destinationTextBox_pop').value;
-                } else {
-                    source = "";
-                    destination = "";
-                }
-
+                source = document.getElementById('sourceTextBox').value;
+                destination = document.getElementById('destinationTextBox').value;
 
                 geocoder.geocode({'address': source}, function(results, status) {
                     if (status == google.maps.GeocoderStatus.OK) {
@@ -519,6 +480,8 @@
                                                 destination: destinationLocation,
                                                 travelMode: google.maps.TravelMode.DRIVING
                                             };
+
+
                                             //polylines.push(response.routes[index].overview_path);
                                             var polyline = new google.maps.Polyline({
                                                 path: []
@@ -573,7 +536,6 @@
                                                     break;
                                             }
 
-
                                             var rendererOptions = {
                                                 preserveViewport: true,
                                                 polylineOptions: {
@@ -616,9 +578,6 @@
                 document.getElementById('findItButton').onclick = function() {
                     routeAddress();
                 };
-                document.getElementById('findItButton_pop').onclick = function() {
-                    routeAddress();
-                };
             }
 
             google.maps.event.addDomListener(window, 'load', initialize);
@@ -627,7 +586,8 @@
                 google.maps.event.trigger(map, "resize");
                 map.setCenter(center);
             });
-        </script>            
+        </script>     
+
     </head>
 
 
@@ -636,11 +596,11 @@
         <div class = "navbar navbar-default navbar-fixed-top">
             <div class = "container">
                 <a href = "index.php" class = "navbar-brand"><img src = "images/routee.png" class ="headpic"></a>
-                <form class="navbar-form navbar-left appear" role="search" id="navRoute">
+                <form class="navbar-form navbar-left appear" role="search">
                     <div class="form-group">
                         <input id="sourceTextBox" type="text" class="form-control" placeholder = "From where?" value='<?php echo $source; ?>'>
                         <input id="destinationTextBox" type="text" class="form-control" placeholder = "To where?" value='<?php echo $destination; ?>'>
-                        <input id="findItButton" type="button" onclick="routeAddress();" class="btn btn-default" value="Show me the way!">
+                        <input id="findItButton" type="button" onclick="routeAddress();" class="btn btn-default" value="Find It">
                         <a id="helpbutton" href = "#getIns" data-toggle="modal"><img src = "images/help.png" class="headpic"></a>
 
                     </div>                 
@@ -678,7 +638,7 @@
                         <div class="media">
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_accident.png">
+                                <img class="media-object" src="images/custom_markers/accident_SD.png">
                             </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Accident</h4>
@@ -686,7 +646,7 @@
                             </div>
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_construction.png">
+                                <img class="media-object" src="images/custom_markers/construction_SD.png">
                             </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Construction</h4>
@@ -694,7 +654,7 @@
                             </div>
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_flood.png">
+                                <img class="media-object" src="images/custom_markers/flood_SD.png">
                             </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Flood</h4>
@@ -702,7 +662,7 @@
                             </div>
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_traffic.png">
+                                <img class="media-object" src="images/custom_markers/traffic_SD.png">
                             </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Traffic</h4>
@@ -710,7 +670,7 @@
                             </div>
 
                             <a class="pull-left">
-                                <img class="media-object" src="images/custom_markers/marker_others.png">
+                                <img class="media-object" src="images/custom_markers/other_SD.png">
                             </a>
                             <div class="media-body">
                                 <h4 class="media-heading">Others</h4>
@@ -744,13 +704,15 @@
                         </div>
                     </div>
                     <hr class = "gdivider">
-                    <form role="search">
-                        <div class="form-group">
-                            <input id="sourceTextBox_pop" type="text" class="form-control" placeholder = "From where?" value='<?php echo $source; ?>'>                        
-                            <br/>
-                            <input id="destinationTextBox_pop" type="text" class="form-control" placeholder = "To where?" value='<?php echo $destination; ?>'>
-                            <br/>
-                            <input id="findItButton_pop" type="button" onclick="routeAddress();" class="btn btn-success btn-group-justified" value="Show me the way!">                            
+                    <form method="POST">
+                        <input name="sourceField" id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
+                        <br/>
+                        <input name="destinationField" id = "destinationSearchText" type="text" class="form-control" placeholder="Where do you want to go?">
+                        <br/>
+                        <div class="btn-group btn-group-justified">
+                            <div class="btn-group">
+                                <button type="submit" name="submitPath" class="btn btn-success"><i class="fa fa-arrows"> </i> Get Directions</button>
+                            </div>
                         </div>
                     </form>
                     <hr class = "gdivider">

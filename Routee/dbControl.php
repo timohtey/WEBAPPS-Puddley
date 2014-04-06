@@ -2,7 +2,7 @@
 
 // database settings 
 $db_username = 'root';
-$db_password = 'berserkx';
+$db_password = '';
 $db_name = 'impassableareas';
 $db_host = 'localhost';
 
@@ -26,7 +26,7 @@ if ($_POST) {
     $mLng = filter_var($mLatLang[1], FILTER_VALIDATE_FLOAT);
 
     if (isset($_POST["del"]) && $_POST["del"] == true) {
-        $results = $mysqli->query("DELETE FROM markers WHERE lat=$mLat AND lng=$mLng");
+        $results = $mysqli->query("UPDATE markers SET deleted='yes' WHERE lat=$mLat AND lng=$mLng");
         if (!$results) {
             header('HTTP/1.1 500 Error: Could not delete Markers!');
             exit();
@@ -38,8 +38,9 @@ if ($_POST) {
     $mType = filter_var($_POST["type"], FILTER_SANITIZE_STRING);
     $mAddress = filter_var($_POST["address"], FILTER_SANITIZE_STRING);
     $mDate = filter_var($_POST["date"], FILTER_SANITIZE_STRING);
+    $mDeleted = filter_var($_POST["deleted"], FILTER_SANITIZE_STRING);
 
-    $results = $mysqli->query("INSERT INTO markers (description, lat, lng, type, address, date) VALUES ('$mDesc',$mLat, $mLng, '$mType', '$mAddress', '$mDate')");
+    $results = $mysqli->query("INSERT INTO markers (description, lat, lng, type, address, date, deleted) VALUES ('$mDesc',$mLat, $mLng, '$mType', '$mAddress', '$mDate', '$mDeleted')");
     if (!$results) {
         header('HTTP/1.1 500 Error: Could not create marker!');
         exit();
@@ -73,6 +74,7 @@ while ($obj = $results->fetch_object()) {
     $newnode->setAttribute("type", $obj->type);
     $newnode->setAttribute("Address", $obj->Address);
     $newnode->setAttribute("date", $obj->date);
+    $newnode->setAttribute("deleted", $obj->deleted);
 }
 echo $dom->saveXML();
 ?>
