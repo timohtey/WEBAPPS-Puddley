@@ -4,7 +4,7 @@ USE `impassableareas`;
 --
 -- Host: localhost    Database: impassableareas
 -- ------------------------------------------------------
--- Server version	5.5.27
+-- Server version	5.6.15
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -32,13 +32,19 @@ CREATE TABLE `markers` (
   `type` varchar(50) NOT NULL,
   `Address` varchar(90) NOT NULL,
   `date` datetime NOT NULL,
+  `deleted` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=48 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping events for database 'impassableareas'
+-- Dumping data for table `markers`
 --
+
+LOCK TABLES `markers` WRITE;
+/*!40000 ALTER TABLE `markers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `markers` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -49,4 +55,4 @@ CREATE TABLE `markers` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-03-23 16:23:11
+-- Dump completed on 2014-04-06 20:23:58
