@@ -9,10 +9,12 @@
         <meta name="description" content="">
         <meta name="author" content="">
 
+
         <link href="css/cover.css" rel="stylesheet" type="text/css">
         <link href="css/fonts.css" type = "text/css" rel = "stylesheet">
         <link href="css/jquery.qtip.css" type="text/css" rel="stylesheet" />
         <link href="font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+        <link rel= "shortcut icon" href="images/routee.png">
 
         <script src="js/jquery-1.10.2.js"></script>     
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>  
@@ -23,7 +25,7 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 $("#btnReporting").click(function() {
-                    $("#rerouting").fadeOut("fast", function() {
+                    $("#routing").fadeOut("fast", function() {
                         $("#reporting").fadeIn("5000");
                     });
                 });
@@ -32,7 +34,7 @@
             $(document).ready(function() {
                 $("#btnRerouting").click(function() {
                     $("#reporting").fadeOut("fast", function() {
-                        $("#rerouting").fadeIn("5000");
+                        $("#routing").fadeIn("5000");
                     });
                 });
             });
@@ -191,7 +193,7 @@
 
                             });
                         }
-                         return false;
+                        return false;
                     }
                 };
 
@@ -205,87 +207,87 @@
     </head>
 
 
-    <body>
-        <div class = "container">
-            <div class = "row">
-                <div class = "cw1">		
-                    <div class = "col-lg-5">
-                        <h2 align="center" id = "me"><img src ="images/routee.png" align = "center"></h2>
-                        <div class = "intros">
-                            <p align = "center"> Routee is a routing application that will <em>direct </em> you to a brighter tomorrow. 
-                                <br><br> If you need assistance, Routee will help you scout out the quickest and most convenient routes that will allow you to pass with ease.
-                                <br><br> Routee also encourages users to participate in contributing reports regarding what is happening on the road.
-                                This ignites the people's willingness to help their fellow drivers and making the road a happier place to travel on.</p>
-                        </div>
+    <body>        
+
+
+        <div class = "container">            
+            <div class = "row">                
+                <div class = "col-md-4 col-md-offset-1">
+                    <h2 align="center" id = "me"><img src ="images/routee.png" align = "center"></h2>
+                    <div class = "intros">                        
+                        <h3 align="center" style="font-weight: bold;">Need some routing assistance?</h3>
+                        <p>Routee can help you scout out the routes with less obstructions to allow you to pass with ease.</p>
+                        <h3 align="center" style="font-weight: bold">Encountered problems on the road?</h3>
+                        <p>Routee encourages users to participate in contributing reports regarding what is happening on the road.
+                            This ignites the people's willingness to help inform their fellow drivers to avoid obstructions on the road.</p>                                                  
                     </div>
-
-                    <div class = "col-lg-2">
-                        <br><br>
-                    </div>
-                    <div class = "col-lg-5">
-                        <div class = "dissidia" id = "rerouting">
-                            <h2 align = "center"> Routing </h2>
-                            <p align = "center"> Routee will assist you in finding the best routes possible.</p>
-                            <br>
-                            <form method="POST" id="routingForm" action="routee.php">
-                                <input name="sourceField" id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
-                                <br/>
-                                <input name="destinationField" id = "destinationSearchText" type="text" class="form-control" placeholder="Where do you want to go?">
-                                <br/>
-                                <div class="btn-group btn-group-justified">
-                                    <div class="btn-group">
-                                        <button type="submit" name="submitRouting" class="btn btn-success"><i class="fa fa-arrows"> </i> Get Directions</button>
-                                    </div>
-                                </div>
-
-                            </form>
-
-                            <hr class = "gdivider">
-                            <p align = "center">If there is a situation going on, please do not hesitate to tell us.</p>
+                </div>
+                <br/>
+                <div class = "col-md-5 col-md-offset-1">
+                    <div class = "dissidia" id="routing">
+                        <h2 align = "center"> Routing </h2>
+                        <p align = "center"> Routee will assist you in finding the best routes possible.</p>
+                        <br>
+                        <form method="POST" id="routingForm" action="routee.php">
+                            <input name="sourceField" id = "sourceSearchText" type="text" class="form-control" placeholder="Where did you come from?">
+                            <br/>
+                            <input name="destinationField" id = "destinationSearchText" type="text" class="form-control" placeholder="Where do you want to go?">
+                            <br/>
                             <div class="btn-group btn-group-justified">
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-info" id = "btnReporting"><i class="fa fa-microphone"> </i> Reporting</button>
+                                    <button type="submit" name="submitRouting" class="btn btn-success"><i class="fa fa-arrows"> </i> Get Directions</button>
                                 </div>
                             </div>
-                        </div> <!--dissidia routing-->
 
-                        <div class ="dissidia" style  = "display:none;" id = "reporting">
-                            <h2 align = "center"> Reporting </h2>
-                            <p align = "center">Let us know what is going on.</p><br>
-                            <!--Reporting form-->
-                            <form method="POST" id="reportForm" action="routee.php">
-                                <select name="pType" class="form-control">
-                                    <option value="Accident">Accident</option>
-                                    <option value="Flood">Flood</option>
-                                    <option value="Construction">Construction</option>
-                                    <option value="Heavy Traffic">Heavy Traffic</option>
-                                    <option value="Others">Others</option>
-                                </select>
-                                <br/>
-                                <input name="placeName" type="text" id = "eventSearchText" class="form-control" placeholder="Where is it happening?" >
-                                <br/>
-                                <textarea id="description" name="pDesc" style = "width:100%;" placeholder="What's going on?" class="form-control"></textarea>
-                                <br/>                            
-                                <div class="btn-group btn-group-justified">
-                                    <div class="btn-group" >                                                       
-                                        <button type="submit" name="submitReport" class="btn btn-success"> <i class="fa fa-microphone"></i> Report</button>
-                                    </div>
-                                </div> <!-- justified buttons end -->
-                                <hr class = "gdivider">					
-                                <p align = "center"> If you want to find the fastest way to your destination, just ask us.</p>
-                                <div class="btn-group btn-group-justified">
-                                    <div class="btn-group" >                                                       
-                                        <button type="button" class="btn btn-info" id="btnRerouting"> <i class="fa fa-arrows"></i> Routing</button>
-                                    </div>
-                                </div> <!-- justified buttons end -->
+                        </form>
 
-                            </form> <!-- form post end -->		
-                        </div> <!--dissidia reporting-->
+                        <hr class = "gdivider">
+                        <p align = "center">If there is a situation going on, please do not hesitate to tell us.</p>
+                        <div class="btn-group btn-group-justified">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info" id = "btnReporting"><i class="fa fa-map-marker"> </i> Reporting</button>
+                            </div>
+                        </div>
+                    </div> <!--dissidia routing-->
+                    <br/>
+                    <div class ="dissidia" style  = "display:none;" id = "reporting">
+                        <h2 align = "center"> Reporting </h2>
+                        <p align = "center">Let us know what is going on.</p><br>
+                        <!--Reporting form-->
+                        <form method="POST" id="reportForm" action="routee.php">
+                            <select name="pType" class="form-control">
+                                <option value="Accident">Accident</option>
+                                <option value="Flood">Flood</option>
+                                <option value="Construction">Construction</option>
+                                <option value="Heavy Traffic">Heavy Traffic</option>
+                                <option value="Others">Others</option>
+                            </select>
+                            <br/>
+                            <input name="placeName" type="text" id = "eventSearchText" class="form-control" placeholder="Where is it happening?" >
+                            <br/>
+                            <textarea id="description" name="pDesc" style = "width:100%;" placeholder="What's going on?" class="form-control"></textarea>
+                            <br/>                            
+                            <div class="btn-group btn-group-justified">
+                                <div class="btn-group" >                                                       
+                                    <button type="submit" name="submitReport" class="btn btn-success"> <i class="fa fa-map-marker"></i> Report</button>
+                                </div>
+                            </div> <!-- justified buttons end -->
+                            <hr class = "gdivider">					
+                            <p align = "center"> If you want to find the fastest way to your destination, just ask us.</p>
+                            <div class="btn-group btn-group-justified">
+                                <div class="btn-group" >                                                       
+                                    <button type="button" class="btn btn-info" id="btnRerouting"> <i class="fa fa-arrows"></i> Routing</button>
+                                </div>
+                            </div> <!-- justified buttons end -->
 
-                    </div><!--col-lg-5-end-->	
-                </div><!--cw1-->
+                        </form> <!-- form post end -->		
+                    </div> <!--dissidia reporting-->
+
+                </div><!--col-lg-5-end-->	
+
+                <br/>
             </div> <!-- row end -->
-        </div> <!-- container-end -->
+        </div> <!-- container-end -->        
     </body>
 
 

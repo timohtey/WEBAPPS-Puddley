@@ -3943,8 +3943,8 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
     }
 }
 .navbar-default {
-    background-color: #95a5a6;
-    border-color: #95a5a6;
+    background-color: #22313F;
+    border-color: #22313F;
 }
 .navbar-default .navbar-brand {
     color: #333333;
@@ -5041,7 +5041,7 @@ a.list-group-item-danger.active:focus {
 }
 .well {
     min-height: 20px;
-    padding: 19px;
+    padding: 15px;
     margin-bottom: 20px;
     background-color: #fafafa;
     border: 1px solid #e8e8e8;
@@ -6252,52 +6252,52 @@ html, body,#map-canvas, #sm-map-canvas {
 
 @media (max-width: 800px) {
 
-.appear{
- display:none;
-}
+    .appear{
+        display:none;
+    }
 
-.linkappear{
- width: 100%;
-}
+    .linkappear{
+        width: 100%;
+    }
 
 
 }
 
 @media (min-width: 800px) {
 
-.hideslide{
-  display: none;
-}
+    .hideslide{
+        display: none;
+    }
 
 }
 
 #slideout {
-  position: fixed;
-  top: 40px;
-  margin-top: 40px;
-  background-color: #5d6d7e;
-  left: 0;
-  z-index: 1;
+    position: fixed;
+    top: 40px;
+    margin-top: 40px;
+    background-color: #5d6d7e;
+    left: 0;
+    z-index: 1;
 }
 
 #slideout_inner {
-  position: fixed;
-  top: 40px;
-  left: -400px;
-  width: 400px;
-  z-index: 1;
+    position: fixed;
+    top: 40px;
+    left: -400px;
+    width: 400px;
+    z-index: 1;
 }
 
 
 .infoslide {
-  min-height: 20px;
-  padding: 19px;
-  margin-bottom: 20px;
-  background-color: #5d6d7e;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    min-height: 20px;
+    padding: 19px;
+    margin-bottom: 20px;
+    background-color: #5d6d7e;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 .gdivider{
@@ -6307,9 +6307,20 @@ html, body,#map-canvas, #sm-map-canvas {
 }
 
 #sourceTextBox{
-    width: 350px;
+    width: 320px;
 }
 
 #destinationTextBox{
-    width: 350px;
+    width: 320px;
+}
+@media (min-width: 800px) and (max-width: 1200px)  {
+
+    #sourceTextBox{
+        width: 200px;
+        
+    }
+
+    #destinationTextBox{
+        width: 200px;
+    }
 }
